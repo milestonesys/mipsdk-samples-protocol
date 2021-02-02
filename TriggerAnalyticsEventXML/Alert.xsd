@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://tempuri.org/Alert.xsd" xmlns="http://tempuri.org/Alert.xsd">
+  <xs:element name="Alert">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Source" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Server" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Description" type="xs:string" minOccurs="0" maxOccurs="1" />
+                  </xs:sequence>
+                  <xs:attribute name="GUID" type="xs:string" use="required" />
+                  <xs:attribute name="Hostname" type="xs:string" use="optional" />
+                  <xs:attribute name="Name" type="xs:string" use="optional" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Device" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Location" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Description" type="xs:string" minOccurs="0" maxOccurs="1" />
+                        </xs:sequence>
+                        <xs:attribute name="GUID" type="xs:string" use="optional" />
+                        <xs:attribute name="Name" type="xs:string" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Description" type="xs:string" minOccurs="0" maxOccurs="1" />
+                  </xs:sequence>
+                  <xs:attribute name="GUID" type="xs:string" use="required" />
+                  <xs:attribute name="Hostname" type="xs:string" use="optional" />
+                  <xs:attribute name="Name" type="xs:string" use="optional" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Rule" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Polygon" type="TPolygon" minOccurs="0" maxOccurs="1">
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="GUID" type="xs:string" use="optional" />
+            <xs:attribute name="Name" type="xs:string" use="required" />
+            <xs:attribute name="Type" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Object" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="BoundingBox" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Color" type="TColor" minOccurs="0" maxOccurs="1" />
+                  </xs:sequence>
+                  <xs:attribute name="Top" type="xs:double" use="required" />
+                  <xs:attribute name="Left" type="xs:double" use="required" />
+                  <xs:attribute name="Bottom" type="xs:double" use="required" />
+                  <xs:attribute name="Right" type="xs:double" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Polygon" type="TPolygon" minOccurs="0" maxOccurs="1" />
+              <xs:element name="Motion" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Path" type="TPolygon" minOccurs="0" maxOccurs="1" />
+                  </xs:sequence>
+                  <xs:attribute name="Speed" type="xs:double" use="optional" />
+                  <xs:attribute name="ScreenSpeed" type="xs:double" use="optional" />
+                  <xs:attribute name="SpeedAngle" type="xs:double" use="optional" />
+                  <xs:attribute name="Acceleration" type="xs:double" use="optional" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Description" type="xs:string" minOccurs="0" maxOccurs="1" />
+            </xs:sequence>
+            <xs:attribute name="ID" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="Name" type="xs:string" use="optional" />
+            <xs:attribute name="Type" type="xs:string" use="optional" />
+            <xs:attribute name="Confidence" type="xs:double" use="optional" />
+            <xs:attribute name="Size" type="xs:double" use="optional" />
+            <xs:attribute name="Count" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="Value" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Description" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="Vendor" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:any minOccurs="0" namespace="##other" processContents="lax" />
+            </xs:sequence>
+            <xs:attribute name="Name" type="xs:string" use="required" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="ID" type="xs:unsignedInt" use="required" />
+      <xs:attribute name="TimeStamp" type="xs:dateTime" use="required" />
+      <xs:attribute name="Name" type="xs:string" use="required" />
+      <xs:attribute name="Type" type="xs:unsignedInt" use="optional" />
+      <xs:attribute name="Priority" type="xs:unsignedByte" use="optional" />
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="TPolygon">
+    <xs:sequence>
+      <xs:element name="Point" minOccurs="1" maxOccurs="unbounded" type="TPoint">
+      </xs:element>
+      <xs:element name="Color" minOccurs="0" maxOccurs="1" type="TColor">
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TColor">
+    <xs:sequence>
+    </xs:sequence>
+    <xs:attribute name="R" type="xs:unsignedByte" use="required" />
+    <xs:attribute name="G" type="xs:unsignedByte" use="required" />
+    <xs:attribute name="B" type="xs:unsignedByte" use="required" />
+    <xs:attribute name="A" type="xs:unsignedByte" use="required" />
+  </xs:complexType>
+  <xs:complexType name="TPoint">
+    <xs:sequence />
+    <xs:attribute name="X" type="xs:double" use="required" />
+    <xs:attribute name="Y" type="xs:double" use="required" />
+  </xs:complexType>
+</xs:schema>

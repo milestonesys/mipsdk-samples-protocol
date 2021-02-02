@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TriggerGenericEvent", "TriggerGenericEvent.csproj", "{5FFC3210-A0D7-4567-9667-505B40048D7C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5FFC3210-A0D7-4567-9667-505B40048D7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FFC3210-A0D7-4567-9667-505B40048D7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FFC3210-A0D7-4567-9667-505B40048D7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FFC3210-A0D7-4567-9667-505B40048D7C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

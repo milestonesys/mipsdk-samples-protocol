@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AnalyticsEvent xmlns:i="http://www.w3.org/2001/XMLSchema-instance" 
+                xmlns="urn:milestone-systems">
+  <EventHeader>
+    <ID>00000000-0000-0000-0000-000000000000</ID>
+    <Timestamp>$timestamp$</Timestamp>
+
+    <Type>MyType</Type>
+    
+    <!-- Insert Event Message here -->
+    <Message>MyAnalyticsEvent01</Message>
+
+    <CustomTag>TagFromXML</CustomTag>
+
+    <Source>
+
+      <!-- Insert camera URI here, if you don't have the GUID. -->
+      <!-- (For multichannel devices, URI may contain channel number after ',') -->
+      <Name>192.168.0.199</Name>
+
+    </Source>
+  </EventHeader>
+
+  <Description>
+    Analytics event description.
+  </Description>
+
+  <Location>
+    Event location 1
+  </Location>
+
+  <Vendor>
+    <Name>My Smart Video</Name>
+  </Vendor>
+
+</AnalyticsEvent>

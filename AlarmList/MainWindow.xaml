@@ -1,0 +1,110 @@
+﻿<Window x:Class="AlarmList.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Alarm List" Height="353" Width="715" Icon="/AlarmList;component/Resources/Icons/alarm-14x14.png" Closing="Window_Closing">
+    
+    <Window.Resources>
+        <BitmapImage x:Key="PrioritiesIcon" UriSource="Resources/Icons/alarm-14x14.png"></BitmapImage>
+        <BitmapImage x:Key="PriorityHighIcon" UriSource="Resources/Icons/alarm-14x14-prioriteret.png"></BitmapImage>
+        <BitmapImage x:Key="PriorityMediumIcon" UriSource="Resources/Icons/alarm-14x14-prioriteret-2.png"></BitmapImage>
+        <BitmapImage x:Key="PriorityLowIcon" UriSource="Resources/Icons/alarm-14x14-prioriteret-3.png"></BitmapImage>
+
+        <GridView x:Key="gridView">
+            <GridViewColumn DisplayMemberBinding="{Binding LocalId}" Width="60">
+                <GridViewColumnHeader Tag="Id" Content="#"  HorizontalContentAlignment="Left" />
+            </GridViewColumn>
+            <GridViewColumn Header="">
+                <GridViewColumn.HeaderTemplate>
+                    <DataTemplate>
+                        <Image Source="{StaticResource PrioritiesIcon}" Width="14" Height="14" />
+                    </DataTemplate>
+                </GridViewColumn.HeaderTemplate>
+                <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                        <Image Name="PriorityImage">
+                            <Image.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Text="{Binding PriorityString}"></TextBlock>
+                                </ToolTip>
+                            </Image.ToolTip>
+                        </Image>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Priority}" Value="1">
+                                <Setter TargetName="PriorityImage" Property="Source" Value="{StaticResource PriorityHighIcon}"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Priority}" Value="2">
+                                <Setter TargetName="PriorityImage" Property="Source" Value="{StaticResource PriorityMediumIcon}"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Priority}" Value="3">
+                                <Setter TargetName="PriorityImage" Property="Source" Value="{StaticResource PriorityLowIcon}"></Setter>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+            <GridViewColumn DisplayMemberBinding="{Binding StateString}" Width="80">
+                <GridViewColumnHeader Tag="State" Content="State"  HorizontalContentAlignment="Left" />
+            </GridViewColumn>
+            <GridViewColumn DisplayMemberBinding="{Binding Timestamp}" Width="124">
+                <GridViewColumnHeader Tag="Time" Content="Timestamp"  HorizontalContentAlignment="Left" />
+            </GridViewColumn>
+            <GridViewColumn DisplayMemberBinding="{Binding Message}" Width="250">
+                <GridViewColumnHeader Tag="Message" Content="Message" HorizontalContentAlignment="Left"  />
+            </GridViewColumn>
+        </GridView>
+        
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="26"></RowDefinition>
+            <RowDefinition Height="26"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <DockPanel>
+                <Label DockPanel.Dock="Left" VerticalAlignment="Center">Search for alarms containing:</Label>
+                <TextBox Name="_textBoxAlarmName" DockPanel.Dock="Right" Text="Motion"></TextBox>
+            </DockPanel>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="120"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <DockPanel>
+                    <Button Name="_buttonGo" Width="60" DockPanel.Dock="Right" Click="Button_Click_Go" Background="#FF7A8EEF">Go</Button>
+                    <TextBox Name="_textBoxServer" DockPanel.Dock="Left" Text="localhost"></TextBox>
+                </DockPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <Button Name="_buttonStop" Click="Button_Click_Stop">Stop</Button>
+            </Grid>            
+        </Grid>
+        <Grid Grid.Row="2">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="120"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+            <ListView Name="_listViewAlarms" Grid.Column="0" View="{StaticResource gridView}"></ListView>
+            <StackPanel Grid.Column="1" Orientation="Vertical">
+                <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
+                    <TextBlock Text="{Binding StatsNew}"></TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding StatsInProgress}"></TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding StatsOnHold}"></TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding StatsClosed}"></TextBlock>
+                </StackPanel>
+                <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
+                    <TextBlock Text="{Binding StatsTotal}"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

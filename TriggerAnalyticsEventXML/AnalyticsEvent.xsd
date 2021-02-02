@@ -1,0 +1,407 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns="urn:milestone-systems"
+targetNamespace="urn:milestone-systems"
+elementFormDefault="qualified"
+version="1.0">
+  
+  <!-- The representation of a Milestone analytics event. -->
+  <xs:element name="AnalyticsEvent">
+    <xs:complexType>
+      <xs:sequence>
+        <!-- The EventHeader, containing information common for all Milestone events. -->
+        <xs:element minOccurs="1" maxOccurs="1" name="EventHeader" type="EventHeader" />
+        
+        <!-- The description of the event. If specified, this will be visible in the Smart Client, when managing alarms based on this event. -->
+        <xs:element minOccurs="0" maxOccurs="1" name="Description" type="xs:string" />
+        
+        <!-- The start time of the event, if it takes plate over a period of time. -->
+        <xs:element minOccurs="0" maxOccurs="1" name="StartTime" type="xs:dateTime" />
+        
+        <!-- The end time of the event, if it takes plate over a period of time. -->
+        <xs:element minOccurs="0" maxOccurs="1" name="EndTime" type="xs:dateTime" />
+        
+        <!-- The location of the event (this will typically be the same as the camera's location). -->
+        <xs:element minOccurs="0" maxOccurs="1" name="Location" type="xs:string" />
+        
+        <!-- The count value, if the event is a counting event. Default: 0 (no count). -->
+        <xs:element minOccurs="0" maxOccurs="1" name="Count" type="xs:unsignedInt" />
+        
+        <!-- The RuleList, containing information contains information about the rule(s), which triggered the analytics event. -->
+        <xs:element minOccurs="0" maxOccurs="1" name="RuleList" type="RuleList" />
+        
+        <!-- The ObjectList, containing information about the detected object(s) in the scene -->
+        <xs:element minOccurs="0" maxOccurs="1" name="ObjectList" type="AnalyticsObjectList" />
+        
+        <!-- The ReferenceList, containing any number of references to other entities in the system, e.g. events or cameras by FQID. Any cameras listed here will be treated as “related cameras” in the Smart Client, when managing alarms based on this event. -->
+        <xs:element minOccurs="0" maxOccurs="1" name="ReferenceList" type="ReferenceList" />
+        
+        <!-- The SnapshotList, containing any number of images related to the event. If the Source is a camera,
+             it is not neccesary to attach a snapshot from that camera at the time of the event. -->
+        <xs:element minOccurs="0" maxOccurs="1" name="SnapshotList" type="SnapshotList" />
+        
+        <!-- The Vendor, containing information about the analytics vendor including any custom data. -->
+        <xs:element minOccurs="0" maxOccurs="1" name="Vendor" type="Vendor" />
+      </xs:sequence>
+
+    </xs:complexType>
+  </xs:element>
+  
+  <!-- The representation of an event header containing information common for all Milestone events. -->
+  <xs:complexType name="EventHeader">
+    <xs:sequence>
+      <!-- The unique ID of the event. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="ID" type="GUID" />
+      
+      <!-- The time of the event. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="Timestamp" type="xs:dateTime" />
+      
+      <!-- The class of the event, e.g. "Analytics" or "Central" -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Class" type="xs:string" />
+      
+      <!-- The type - a sub-classification - of the event, if applicable, e.g. "License Plate Recognition" -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Type" type="xs:string" />
+      
+      <!-- The version of this document schema. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Version" type="xs:string" />
+      
+      <!-- The priority of the event. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Priority" type="xs:unsignedShort" />
+      
+      <!-- The event name. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+      
+      <!-- The event message. This must match the event message in an alarm definition for the event server to trigger an alarm. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="Message" type="xs:string" />
+      
+      <!-- A custom tag set by the user to filter triggered alarms in the Smart Client. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="CustomTag" type="xs:string" />
+      
+      <!-- The source of the event. This can represent e.g. a camera, a microphone, a user-defined event, etc. This must also match the source in an alarm definition for the event server to trigger an alarm. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Source" type="EventSource" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- The representation of a GUID, generally the id of an element. -->
+  <xs:simpleType name="GUID">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <!-- The source of the event. This can represent e.g. a camera, a microphone, a user-defined event, etc. -->
+  <xs:complexType name="EventSource">
+    <xs:sequence>
+      <!-- The name of the source. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+      
+      <!-- A description of the source. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Description" type="xs:string" />
+      
+      <!-- The Fully Qualified ID of the source. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="FQID" type="FQID" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- The Fully Qualified ID contains a complete set of fields to contact a server and get further details. -->
+  <xs:complexType name ="FQID">
+    <xs:sequence>
+      <!-- Id of the server that owns the item. -->
+      <xs:element name="ServerId" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <!-- The server type, e.g. "XPCO" or "XPE" -->
+            <xs:element minOccurs="0" maxOccurs="1" name="Type" type="xs:string" />
+            
+            <!-- The server hostname. -->
+            <xs:element minOccurs="0" maxOccurs="1" name="Hostname" type="xs:string" />
+            
+            <!-- The server port. -->
+            <xs:element minOccurs="0" maxOccurs="1" name="Port" type="xs:int" />
+            
+            <!-- The server ID. -->
+            <xs:element minOccurs="1" maxOccurs="1" name="Id" type="GUID" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <!-- The ID of the parent if applicable, e.g. recorder ID for cameras, or camera ID for PTZ Presets. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="ParentId" type="GUID" />
+      
+      <!-- The ID of the item itself (except for Presets, see below). -->
+      <xs:element minOccurs="0" maxOccurs="1" name="ObjectId" type="GUID" />
+      
+      <!-- The ID of the item, when the ID is not a GUID, e.g. a preset. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="ObjectIdString" type="xs:string" />
+      
+      <!-- Defines if this object is a folder, e.g. contains children:
+           0: No
+           1: SystemDefined
+           2: UserDefined -->
+      <xs:element minOccurs="1" maxOccurs="1" name="FolderType" type="xs:unsignedByte" />
+      
+      <!-- The type identifier of this item. The most common item kinds have been predefined in  VideoOS.Platform.Kind:
+           3B25FE94-7C2F-499a-86DF-2FA68AA3E1B5: Server
+           3F7F49E3-D027-450b-8BC5-590EC9AA5376: Alarm
+           5135BA21-F1DC-4321-806A-6CE2017343C0: Camera
+           B77D68FC-B231-441b-8EB5-901C89234111: Speaker
+           DF6284F6-18EE-4506-B8C4-65B5F31A140C: Microphone
+           5FC737A9-BBF6-4473-A421-7E8075D45D9C: InputEvent
+           C9BDAC3F-41DC-4afa-B057-61767A3914B7: TriggerEvent
+           CBAAA726-A089-4db6-8F0D-48772E595B1B: Output
+           083A635C-8412-4ea2-8DD9-9223FCA35AB6: Preset
+           9A1492D1-FCA0-44d7-BA9C-3699C99063A7: TransactSource
+           F0E91DE0-4E81-4f00-8BB6-B9C932D5B598: Folder
+           B4F8C44A-84B4-4333-8B8D-4B621A149C0B: Matrix
+           84ED10D8-D5BC-4785-9C8E-F84440218F24: View
+           15DA80D4-7595-431f-9866-674D2B80ACC5: Window
+           BBB64F9C-E3C7-41d4-A77E-D488390D7FCB: Screen -->
+      <xs:element minOccurs="1" maxOccurs="1" name="Kind" type="GUID" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- A list of rules. -->
+  <xs:complexType name="RuleList">
+    <xs:sequence>
+ 
+      <!-- A rule, which triggered the event. -->
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Rule" type="Rule" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- The representation of a rule, which triggered the event. -->
+  <xs:complexType name="Rule">
+    <xs:sequence>
+      <!-- The ID of the rule. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="ID" type="GUID" />
+      
+      <!-- The name of the rule. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+      
+      <!-- The type of the rule. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Type" type="xs:string" />
+      
+      <!-- A list of polygons illustrating the rule within the scene (tripwires, areas, etc.). -->
+      <xs:element minOccurs="0" maxOccurs="1" name="PolygonList" type="PolygonList" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- A list of polygons. -->
+  <xs:complexType name="PolygonList">
+    <xs:sequence>
+      <!-- A polygon. -->
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Polygon" type="TPolygon" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- The representation of a polygon describing a set of normalized coordiantes and color. -->
+  <xs:complexType name="TPolygon">
+    <xs:sequence>
+      <!-- A flag indicating whether the polygon is open or closed. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Closed" type="xs:boolean" />
+      
+      <!-- The preferred color of the polygon. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Color" type="TColor" />
+      
+      <!-- The preferred fill color of a closed polygon, if any. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="FillColor" type="TColor" />
+      
+      <!-- A list of points, describing the polygon. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="PointList" type="PointList" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- A list of points -->
+  <xs:complexType name="PointList">
+    <xs:sequence>
+      <!-- A point. -->
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Point" type="TPoint" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- The representation of a point described by a set of normalized coordinates. -->
+  <xs:complexType name="TPoint">
+    <xs:sequence>
+      <!-- The normalized X coordinate [0;1]. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="X" type="xs:double" />
+      
+      <!-- The normalized Y coordinate [0;1]. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="Y" type="xs:double" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- The representation of an ARGB color. -->
+  <xs:complexType name="TColor">
+    <xs:sequence>
+      <!-- The alpha channel [0;255]. 0 represents a fully transparent color, and 255 represents a fully opaque color. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="A" type="xs:unsignedByte" />
+      
+      <!-- The red color channel [0;255]. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="R" type="xs:unsignedByte" />
+      
+      <!-- The green color channel [0;255]. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="G" type="xs:unsignedByte" />
+      
+      <!-- The blue color channel [0;255]. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="B" type="xs:unsignedByte" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- A list of snapshots. -->
+  <xs:complexType name="SnapshotList">
+    <xs:sequence>
+      <!-- A snapshot. -->
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Snapshot" type="Snapshot" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- The representation of a snapshot associated with the event with time offset relative to the event timestamp. -->
+  <xs:complexType name="Snapshot">
+    <xs:sequence>
+  
+      <!-- The time offset in milliseconds relative to the event timestamp. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="TimeOffset" type="xs:int"/>
+      
+      <!-- The width of the image in pixels. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Width" type="xs:unsignedInt" />
+      
+      <!-- The height of the image in pixels. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Height" type="xs:unsignedInt" />
+      
+      <!-- A flag indicating whether the image has overlay rendered into the image. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="HasOverlay" type="xs:boolean" />
+      
+      <!-- The size in bytes of the binary image. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="SizeInBytes" type="xs:unsignedInt" />
+      
+      <!-- A (base64) binary JPEG image, if the image is stored in the database. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Image" type="xs:base64Binary" />
+      
+      <!-- A path to the image on the server, if the image is stored on the central server. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Path" type="xs:string" />
+      
+      <!-- A FQID to a camera, if the snaphort referes to the recorded image on the recording server. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="FQID" type="FQID" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- A list of analytics objects. -->
+  <xs:complexType name="AnalyticsObjectList">
+    <xs:sequence>
+      <!-- An analytics object. -->
+      <xs:element name="Object" type="AnalyticsObject" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- The representation of an analytics object. -->
+  <xs:complexType name="AnalyticsObject">
+    <xs:sequence>
+      <!-- The ID of the object. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="ID" type="GUID" />
+      
+      <!-- The name of the object. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+      
+      <!-- The type of the object. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Type" type="xs:string" />
+      
+      <!-- A description of the object. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Description" type="xs:string" />
+      
+      <!-- Normalized confidence of the detection [0;1]. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Confidence" type="xs:double" />
+      
+      <!-- A value associated with the object. This could be a detected license plate, or the number of people in a detected crowd, etc. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Value" type="xs:string" />
+      
+      <!-- A flag indicating whether the object is the cause of the event. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="AlarmTrigger" type="xs:boolean" />
+      
+      <!-- A flag indicating whether this object referes to a removed object. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Removed" type="xs:boolean" />
+      
+      <!-- Human-readable color of the object. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Color" type="xs:string" />
+      
+      <!-- Human-readable size of the object in the unit given SizeUnit. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Size" type="xs:double" />
+      
+      <!-- The unit of the object's Size. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="SizeUnit" type="xs:string" />
+      
+      <!-- The bounding box of the object. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="BoundingBox" type="BoundingBox" />
+      
+      <!-- An outline of the object. For complex objects, it is not recommended setting the polygon due to verbosity. Use BoundingBox or Mask instead. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Polygon" type="TPolygon" />
+      
+      <!-- The motion of the object (speed and path). -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Motion" type="ObjectMotion" />
+      
+      <!-- A binary mask of the object within the boudingbox. -->
+      <xs:element minOccurs="0" maxOccurs="1" name ="Mask" type="xs:base64Binary" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- The representation of a bounding box, describing a rectangle in normalized coordinates within the scene. -->
+  <xs:complexType name="BoundingBox">
+    <xs:sequence>
+      <!-- The top of the bounding box. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="Top" type="xs:double" />
+      
+      <!-- The left side of the bounding box. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="Left" type="xs:double" />
+      
+      <!-- The bottom of the bounding box. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="Bottom" type="xs:double" />
+      
+      <!-- The right side of the bounding box. -->
+      <xs:element minOccurs="1" maxOccurs="1" name="Right" type="xs:double" />
+      
+      <!-- The preferred color of the boudnig box. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Color" type="TColor" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- The representation of an objects tracked motion through the scene. -->
+  <xs:complexType name="ObjectMotion">
+    <xs:sequence>
+      <!-- Human-reable speed of the object in the units given by SpeedUnit. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Speed" type="xs:double" />
+      
+      <!-- The unit of the object's Speed. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="SpeedUnit" type="xs:string" />
+      
+      <!-- The path of tracked the object. The polygon should typically be defined as Open. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Path" type="TPolygon" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- A list of references. -->
+  <xs:complexType name="ReferenceList">
+    <xs:sequence>
+ 
+      <!-- A reference to another entity in the system - e.g. another device or event. -->
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Reference" type="Reference" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- The representation of a reference to another entity in the system - e.g. another device or event. -->
+  <xs:complexType name="Reference">
+    <xs:sequence>
+      <!-- The Fully Quallified  -->
+      <xs:element minOccurs="0" maxOccurs="1" name="FQID" type="FQID" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- Information about the analytics vendor including any custom data. -->
+  <xs:complexType name="Vendor">
+    <xs:sequence>
+      <!-- The name of the vendor -->
+      <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+      
+      <!-- Custom vendor data. XML should be wrapped in '<![CDATA[', ']]>' or use '&lt;', '&gt;' for '<', '>'.
+           Note that custom data will not be indexed; therefore retrieving it will not be optimized. -->
+      <xs:element minOccurs="0" maxOccurs="1" name="CustomData" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
