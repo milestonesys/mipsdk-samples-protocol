@@ -34,7 +34,7 @@
             </StackPanel>
             <GridSplitter Grid.Column="1" Height="Auto" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsTabStop="False"></GridSplitter>
             <Canvas Grid.Column="2" Width="auto" Height="auto">
-                <Image Name="_videoCanvas" Source="{Binding VideoImage}" Width="auto" Height="auto"></Image>
+                <Image Name="_videoCanvas" Source="{Binding VideoImage, TargetNullValue={x:Null}}" Width="auto" Height="auto"></Image>
                 <StackPanel Margin="9,6,0,0" Orientation="Vertical">
                     <Image Source="{StaticResource MilestoneLogoIcon}" Width="auto" Height="auto"></Image>
                     <TextBlock Text="{Binding PlaybackTimeString}" FontSize="12" Background="#00FFFFFF" Foreground="#78B2DE" TextAlignment="Center"></TextBlock>

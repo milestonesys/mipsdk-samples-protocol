@@ -88,8 +88,11 @@ namespace LoginDotNetSoap_CS
                 /*
                  * Establish a connection, where Windows authentication is used, and log in
                  */
+                var authenticationType = string.IsNullOrEmpty(userInputs.Username)
+                    ? AuthenticationType.WindowsDefault
+                    : AuthenticationType.Windows;
                 serverCommandServiceNtlm = new ServerCommandWrapper.Ntlm.NtlmConnection(userInputs.Domain,
-                    AuthenticationType.Windows, userInputs.Username, userInputs.Password,
+                    authenticationType, userInputs.Username, userInputs.Password,
                     userInputs.Hostname, userInputs.Port);
                 try
                 {
@@ -116,7 +119,7 @@ namespace LoginDotNetSoap_CS
              * Now connect to a recording service or image server   *
              * ******************************************************/
 
-            // The next 10 lines will normally be taken from the SystemInfo.xml, or GetConfiguretion() result,
+            // The next 10 lines will normally be taken from the SystemInfo.xml, or GetConfiguration() result,
             // as each camera configuration contains the URL for the Recording server it is defined on.
             String imageServerName = String.Empty;
             int port = 80;
@@ -199,7 +202,7 @@ namespace LoginDotNetSoap_CS
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception occured: " + e.Message);
+                Console.WriteLine("Exception occurred: " + e.Message);
             }
         }
 

@@ -31,7 +31,7 @@ namespace TriggerAnalyticsEventXML
             string analyticsXml = txtAnalyticsXML.Text;
             analyticsXml = analyticsXml.Replace("$timestamp$", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:sszzz"));
             // Sending the XML
-            // Note the response is important, you can see whether the AnalyticsEvent was succesfully received
+            // Note the response is important, you can see whether the AnalyticsEvent was successfully received
             string response = SendXmlWithSocket(analyticsXml, txtDestinationAddress.Text, Convert.ToInt32(txtDestinationPort.Text));
             txtResponse.Text = response;
         }
@@ -54,7 +54,7 @@ namespace TriggerAnalyticsEventXML
 
         bool ValidateTextbox()
         {
-            bool succ = true;
+            bool success = true;
             XmlDocument xmlCopy = new XmlDocument();
             xmlCopy.Schemas.Add("urn:milestone-systems", "AnalyticsEvent.xsd"); // AnalyticsEvent XSD
             xmlCopy.Schemas.Add("http://tempuri.org/Alert.xsd", "Alert.xsd");   // Alert XSD put in the sample enable the sending of this older format
@@ -69,14 +69,14 @@ namespace TriggerAnalyticsEventXML
             catch (Exception  e)
             {
                 txtResponse.Text = e.Message.ToString();
-                succ = false;
+                success = false;
             }
 
-            if (succ)
+            if (success)
             {
                 txtResponse.Text = "Successfully validated the XML against the schemas.";
             }
-            return succ;
+            return success;
         }
         #endregion
 

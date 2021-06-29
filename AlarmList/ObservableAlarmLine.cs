@@ -29,7 +29,7 @@ namespace AlarmList
         public AlarmLine AlarmLine { get; set; } = null;
 
         /// <summary>
-        /// Gets the identier as a number - human readable id
+        /// Gets the identifier as a number - human readable id
         /// </summary>
         public int LocalId
         {

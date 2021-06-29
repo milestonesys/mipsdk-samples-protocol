@@ -37,6 +37,7 @@ namespace TcpVideoViewer
         private void Token_Refreshed(object sender, string e)
         {
             TokenString = e;
+            _sysInfo.LoginInfo.Token = TokenString;
             NotifyPropertyChanged("TokenString");
             Dispatcher.Invoke(() =>
             {
@@ -50,7 +51,7 @@ namespace TcpVideoViewer
 
                 // We need to update the Token on the recording server:
                 // This will pass the token back on the live imageserver TCP session using the CONNECTUPDATE command
-                // DoLiveCmd() will do nothing if there is no live sesssion
+                // DoLiveCmd() will do nothing if there is no live session
                 _isc.DoLiveCmd(_isc.FormatConnectUpdate());
 
                 // This will cause an active playback to pass the token back on the imageserver TCP session using the CONNECTUPDATE command
@@ -183,20 +184,20 @@ namespace TcpVideoViewer
                 XmlNodeList nodes = doc.GetElementsByTagName("alarm");
                 foreach (XmlNode node in nodes)
                 {
-                    XmlAttributeCollection atts = node.Attributes;
+                    XmlAttributeCollection attrs = node.Attributes;
                     string start = "";
                     string end = "";
                     string alarm = "??";
 
-                    for (int ii = 0; ii < atts.Count; ii++)
+                    for (int ii = 0; ii < attrs.Count; ii++)
                     {
-                        XmlAttribute att = (XmlAttribute)atts.Item(ii);
-                        if (att.Name.ToLower().Equals("starttime"))
-                            start = att.Value;
-                        if (att.Name.ToLower().Equals("endtime"))
-                            end = att.Value;
-                        if (att.Name.ToLower().Equals("alarmtime"))
-                            alarm = att.Value;
+                        XmlAttribute attr = (XmlAttribute)attrs.Item(ii);
+                        if (attr.Name.ToLower().Equals("starttime"))
+                            start = attr.Value;
+                        if (attr.Name.ToLower().Equals("endtime"))
+                            end = attr.Value;
+                        if (attr.Name.ToLower().Equals("alarmtime"))
+                            alarm = attr.Value;
 
                     }
 

@@ -1,20 +1,19 @@
-﻿using System;
-using System.IO;
+﻿using ServerCommandService;
+using ServerCommandWrapper.OAuth;
+using System;
 using System.Net;
 using System.ServiceModel;
 using System.ServiceModel.Security;
-using System.Text;
 using System.Threading;
-using System.Xml;
-using ServerCommandService;
-
+using System.Threading.Tasks;
+using static ServerCommandWrapper.Basic.BasicConnection;
 
 namespace ServerCommandWrapper.Ntlm
 {
-    /// <summary>
-    /// A class to represent the NTLM connection between the client a server.
-    /// </summary>
-    public class NtlmConnection
+	/// <summary>
+	/// A class to represent the NTLM connection between the client a server.
+	/// </summary>
+	public class NtlmConnection
     {
         public ServerCommandServiceClient Server
         {
@@ -24,12 +23,17 @@ namespace ServerCommandWrapper.Ntlm
         private readonly Guid _thisInstance = Guid.NewGuid();
         private Timer _tokenExpireTimer;
 
-        private readonly String _serverUrl;
+        private readonly String _hostName;
+        private readonly bool _isOAuthServer;
         private readonly int _port;
         private readonly AuthenticationType _authType;
         private readonly String _username;
         private readonly String _password;
         private readonly String _domain;
+
+        // Set to http if your IDP server is running not secure
+        // Only relevant for servers in version 2021R1 or newer
+        private const string OAuthServerPrefix = "https";
 
         private ServerCommandService.LoginInfo _loginInfo;
 
@@ -65,47 +69,65 @@ namespace ServerCommandWrapper.Ntlm
         /// <param name="password">The password related to the username</param>
         /// <param name="hostname">The hostname</param>
         /// <param name="port">The used port</param>
-         public NtlmConnection(String domain, AuthenticationType authType, String username, String password,
-            String hostname, int port = 80)
+        public NtlmConnection(String domain, AuthenticationType authType, String username, String password, String hostname, int port = 80)
         {
             //Precondition
+            string prefix = "http";
             if (hostname.StartsWith("http://"))
+            {
                 hostname = hostname.Substring("http://".Length);
+            }
 
-            _serverUrl = hostname;
-            _port = port;
+            if (hostname.StartsWith("https://"))
+            {
+                hostname = hostname.Substring("https://".Length);
+                prefix = "https";
+            }
+
+            _hostName = hostname;
             _authType = authType;
             _username = username;
             _password = password;
             _domain = domain;
 
-            String url;
-            String prefix = "http";
-
-            if (_port == 443) 
-                prefix += "s";
-
-            url = $"{prefix}://{hostname}:{_port}/ManagementServer/ServerCommandService.svc";
-            WSHttpBinding binding = new WSHttpBinding()
+            _isOAuthServer = Task.Run(() => IdpClientProxy.IsOAuthServer(_hostName, OAuthServerPrefix, port == 80 ? 443 : port)).GetAwaiter().GetResult();
+            if (_isOAuthServer)
             {
-                MaxReceivedMessageSize = 1000000
-            };
-            EndpointAddress remoteAddress = new EndpointAddress(url);
-
-            Server = new ServerCommandServiceClient(binding, remoteAddress);
-            Server.ClientCredentials.Windows.ClientCredential.UserName = username;
-            Server.ClientCredentials.Windows.ClientCredential.Password = password;
-            if (!String.IsNullOrEmpty(_domain))
-                Server.ClientCredentials.Windows.ClientCredential.Domain = _domain;
-
-            // TODO Any certificate is accepted as OK !!
-            Server.ClientCredentials.ServiceCertificate.SslCertificateAuthentication = new X509ServiceCertificateAuthentication()
+                _port = port == 80 ? 443 : port;
+	            // If the OAuth server is available it uses OAuth version of ServerCommandService.
+				var uri = ManagementServerOAuthHelper.CalculateServiceUrl(hostname, _port, OAuthServerPrefix);
+	            var oauthBinding = ManagementServerOAuthHelper.GetOAuthBinding(isHttps: OAuthServerPrefix == "https");
+	            string spn = SpnFactory.GetSpn(uri);
+	            EndpointAddress endpointAddress = new EndpointAddress(uri, EndpointIdentity.CreateSpnIdentity(spn));
+	            Server = new ServerCommandServiceClient(oauthBinding, endpointAddress);
+            }
+            else
             {
-                CertificateValidationMode = X509CertificateValidationMode.None,
-            };           
+                _port = port;
+                if (_port == 443 && prefix != "https")
+                    prefix = "https";
 
+                var url = $"{prefix}://{hostname}:{_port}/ManagementServer/ServerCommandService.svc";
+	            WSHttpBinding binding = new WSHttpBinding()
+	            {
+		            MaxReceivedMessageSize = 1000000
+	            };
+	            EndpointAddress remoteAddress = new EndpointAddress(url);
+
+	            Server = new ServerCommandServiceClient(binding, remoteAddress);
+	            Server.ClientCredentials.Windows.ClientCredential.UserName = username;
+	            Server.ClientCredentials.Windows.ClientCredential.Password = password;
+	            if (!String.IsNullOrEmpty(_domain))
+		            Server.ClientCredentials.Windows.ClientCredential.Domain = _domain;
+
+	            // TODO Any certificate is accepted as OK !!
+	            Server.ClientCredentials.ServiceCertificate.SslCertificateAuthentication =
+		            new X509ServiceCertificateAuthentication()
+		            {
+			            CertificateValidationMode = X509CertificateValidationMode.None,
+		            };
+            }
         }
-
 
 
         /// <summary>
@@ -113,22 +135,49 @@ namespace ServerCommandWrapper.Ntlm
         /// </summary>        
         private LoginInfo Login() 
         {
-            string currentToken = "";
-            
+	        string currentToken = "";
+	        double accessTokenTimeToLive = 0;
 
-            if (_loginInfo != null)
-                currentToken = _loginInfo.Token;
-            // Now call the login method on the server, and get the loginInfo class (provide old token for next re-login)
-            _loginInfo = Server.Login(_thisInstance, currentToken);
 
-            // React 30 seconds before token expires. (Never faster than 30 seconds after last renewal, but that ought not occur).
-            // Default timeout is 1 hour.
-            double ms = LoginInfo.TimeToLive.TotalMilliseconds;
-            ms = ms > 60000 ? ms - 30000 : ms;
+	        if (_loginInfo != null)
+		        currentToken = _loginInfo.Token;
 
-            _tokenExpireTimer = new Timer(TokenExpireTimer_Callback, null, (int)ms, Timeout.Infinite);
+	        if (_isOAuthServer)
+	        {
+		        NetworkCredential nc = _authType == AuthenticationType.WindowsDefault
+			        ? null
+			        : new NetworkCredential(_username, _password, _domain);
+		        var accessToken = Task
+			        .Run(() => IdpClientProxy.GetAccessTokenForWindowsUserAsync(_hostName, OAuthServerPrefix, _port, nc)).GetAwaiter()
+			        .GetResult();
+		        if (accessToken != null) // Access token is received from Identity server in exchange user credentials.
+		        {
+			        // Check if the behavior already exists, otherwise will throw an exception when re-login.
+                    if (Server.Endpoint.EndpointBehaviors.Contains(typeof(AddTokenBehavior)))
+			        {
+				        Server.Endpoint.EndpointBehaviors.Remove(typeof(AddTokenBehavior));
+			        }
+			        // Access token is added to the request header through the EndpointBehaviour, thus user credentials are no longer
+			        // needed to get the corporate token. 
+                    Server.Endpoint.EndpointBehaviors.Add(new AddTokenBehavior(accessToken.Access_Token));
+			        ManagementServerOAuthHelper.ConfigureEndpoint(Server.Endpoint);
+                    // Default expiry time for the access token is 3600 seconds.
+			        accessTokenTimeToLive = TimeSpan.FromSeconds(accessToken.Expires_In).TotalMilliseconds;
+		        }
+	        }
 
-            return LoginInfo;
+	        // Now call the login method on the server, and get the loginInfo class (provide old token for next re-login)
+	        _loginInfo = Server.Login(_thisInstance, currentToken);
+
+            // If access token is available then take the minimum time to live between access token and corporate token (token) as expiry time.
+	        // React 30 seconds before token expires. (Never faster than 30 seconds after last renewal, but that ought not occur).
+	        // Default timeout is 1 hour.
+	        double ms = accessTokenTimeToLive != 0 ? Math.Min(LoginInfo.TimeToLive.TotalMilliseconds, accessTokenTimeToLive) : LoginInfo.TimeToLive.TotalMilliseconds;
+	        ms = ms > 60000 ? ms - 30000 : ms;
+
+	        _tokenExpireTimer = new Timer(TokenExpireTimer_Callback, null, (int)ms, Timeout.Infinite);
+
+	        return LoginInfo;
         }
 
         /// <summary>
@@ -136,31 +185,17 @@ namespace ServerCommandWrapper.Ntlm
         /// </summary>        
         public LoginInfo Login(Guid integrationId, string version, string integrationName)
         {
-            string currentToken = "";
-
-
-            if (_loginInfo != null)
-                currentToken = _loginInfo.Token;
-            // Now call the login method on the server, and get the loginInfo class (provide old token for next re-login)
-            _loginInfo = Server.Login(_thisInstance, currentToken);
-
+	        var loginInfo = Login();
             try
             {
-                Server.RegisterIntegration(_loginInfo.Token, Constants.InstanceId, integrationId, version, integrationName, Constants.ManufacturerName);
+                Server.RegisterIntegration(_isOAuthServer ? "" : _loginInfo.Token, Constants.InstanceId, integrationId, version, integrationName, Constants.ManufacturerName);
             }
             catch
             {
                 // on older systems this method does not exist so we will just silently ignore any exceptions - and with no retry. Consequences of failing are ignorable anyways
             }
 
-            // React 30 seconds before token expires. (Never faster than 30 seconds after last renewal, but that ought not occur).
-            // Default timeout is 1 hour.
-            double ms = LoginInfo.TimeToLive.TotalMilliseconds;
-            ms = ms > 60000 ? ms - 30000 : ms;
-
-            _tokenExpireTimer = new Timer(TokenExpireTimer_Callback, null, (int)ms, Timeout.Infinite);
-
-            return LoginInfo;
+            return loginInfo;
         }
 
         /// <summary>

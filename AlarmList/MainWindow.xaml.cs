@@ -190,8 +190,13 @@ namespace AlarmList
                     return;
                 }
 
-            } else {
-                _ntlmLogin = new NtlmConnection(_domainName, AuthenticationType.Windows, _userName, _password, _hostName, _port);
+            }
+            else
+            {
+                var authType = CurrentSetup == Setup.WindowsUser
+                    ? AuthenticationType.Windows
+                    : AuthenticationType.WindowsDefault;
+                _ntlmLogin = new NtlmConnection(_domainName, authType, _userName, _password, _hostName, _port);
 
                 try
                 {
@@ -449,7 +454,7 @@ namespace AlarmList
                 for (int i = 0; i <= bottomIndex ; i++) 
                 {
                     // We assume that the alarms received are always ordered by time descending, and the Alarm.ID is unique per instance of an Alarm
-                    // Thus is is given that if a given ID is ordered after another ID once, it will always be after that other ID.
+                    // Thus it is given that if a given ID is ordered after another ID once, it will always be after that other ID.
                     //
                     // There are two possibilities
                     // A: The received item is new and does not appear in the collection,
@@ -474,7 +479,7 @@ namespace AlarmList
                             _alarmObserverCollection.RemoveAt(i);
                         }
 
-                        // We must then update the individual properties of the alarm in the list with those proterty values from the new alarm
+                        // We must then update the individual properties of the alarm in the list with those property values from the new alarm
                         // Just setting _alarmObserverCollection[i] = alarm cause the WPF list view's multiple selection mechanism to get confused.
                         UpdateCollectionItem(i, alarm);
                     }
@@ -505,7 +510,7 @@ namespace AlarmList
         /// Find a given alarm in the old list
         /// </summary>
         /// <param name="i">index in old list to start from</param>
-        /// <param name="id">GUID of individual alam to find</param>
+        /// <param name="id">GUID of individual alarm to find</param>
         /// <returns></returns>
         private int FindId(int i, Guid id)
         {

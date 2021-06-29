@@ -9,7 +9,7 @@ using System.Text;
 using LoginInfo = ServerCommandWrapper.LoginInfo;
 
 
-namespace DemoBookmarks
+namespace BookmarkCreator
 {
 
 
