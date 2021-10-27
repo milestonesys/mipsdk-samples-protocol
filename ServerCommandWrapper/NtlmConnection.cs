@@ -90,10 +90,11 @@ namespace ServerCommandWrapper.Ntlm
             _password = password;
             _domain = domain;
 
-            _isOAuthServer = Task.Run(() => IdpClientProxy.IsOAuthServer(_hostName, OAuthServerPrefix, port == 80 ? 443 : port)).GetAwaiter().GetResult();
+            _isOAuthServer = Task.Run(() => IdpClientProxy.IsOAuthServer(_hostName, OAuthServerPrefix, port)).GetAwaiter().GetResult();
             if (_isOAuthServer)
             {
-                _port = port == 80 ? 443 : port;
+                _port = port;
+
 	            // If the OAuth server is available it uses OAuth version of ServerCommandService.
 				var uri = ManagementServerOAuthHelper.CalculateServiceUrl(hostname, _port, OAuthServerPrefix);
 	            var oauthBinding = ManagementServerOAuthHelper.GetOAuthBinding(isHttps: OAuthServerPrefix == "https");
@@ -107,8 +108,8 @@ namespace ServerCommandWrapper.Ntlm
                 if (_port == 443 && prefix != "https")
                     prefix = "https";
 
-                var url = $"{prefix}://{hostname}:{_port}/ManagementServer/ServerCommandService.svc";
-	            WSHttpBinding binding = new WSHttpBinding()
+                var url = $"{prefix}://{hostname}:{_port}/ManagementServer/ServerCommandService.svc";                
+                WSHttpBinding binding = new WSHttpBinding()
 	            {
 		            MaxReceivedMessageSize = 1000000
 	            };
@@ -165,7 +166,6 @@ namespace ServerCommandWrapper.Ntlm
 			        accessTokenTimeToLive = TimeSpan.FromSeconds(accessToken.Expires_In).TotalMilliseconds;
 		        }
 	        }
-
 	        // Now call the login method on the server, and get the loginInfo class (provide old token for next re-login)
 	        _loginInfo = Server.Login(_thisInstance, currentToken);
 

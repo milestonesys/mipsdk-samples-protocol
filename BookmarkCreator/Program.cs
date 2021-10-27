@@ -26,14 +26,15 @@ namespace BookmarkCreator
             /************************************************************
              * Please change these accordingly to your own environment  *
              ************************************************************/
-            String username = "";
-            String password = "";
-            String domain = "";            
+            string username = "";
+            string password = "";
+            string domain = "";
+            AuthenticationType authType = AuthenticationType.Basic;
 
-            AuthenticationType authType = AuthenticationType.WindowsDefault;
-            String hostAddress = "localhost";
+            //remember, if you are not using https when connection to 2021R1 server or newer, go into ServerCommandWrapper and update the OAuthServerPrefix in BasicConnection.cs and NtlmConnection.cs, so the connections will use http
+            String hostAddress = "https://computerUrl";
             int port = 80;
-            if (authType == AuthenticationType.Basic)
+            if (hostAddress.StartsWith("https", StringComparison.InvariantCultureIgnoreCase))
                 port = 443; //SSL
 
 

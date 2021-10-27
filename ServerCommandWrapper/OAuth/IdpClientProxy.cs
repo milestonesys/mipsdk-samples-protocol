@@ -174,7 +174,7 @@ namespace ServerCommandWrapper.OAuth
 		/// <returns></returns>
 		private static bool HasOAuthServer(string httpContent)
 		{
-			string pattern = "\"server_version\"" + ":" + "\"[0-9]{1,2}.{0,1}[0-9]\"";
+			string pattern = "\"server_version\"" + ":" + "\"[0-9]{1,2}\\.[0-9]";
 			Regex rgx = new Regex(pattern);
 			var result = rgx.Match(httpContent);
 			if (result.Success)
