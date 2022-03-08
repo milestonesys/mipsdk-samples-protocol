@@ -29,7 +29,7 @@ namespace TriggerAnalyticsEventXML
             //Replace timestamp token with current time
             lblResponse.Text = "Socket response";
             string analyticsXml = txtAnalyticsXML.Text;
-            analyticsXml = analyticsXml.Replace("$timestamp$", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:sszzz"));
+            analyticsXml = analyticsXml.Replace("$timestamp$", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"));
             // Sending the XML
             // Note the response is important, you can see whether the AnalyticsEvent was successfully received
             string response = SendXmlWithSocket(analyticsXml, txtDestinationAddress.Text, Convert.ToInt32(txtDestinationPort.Text));
@@ -59,7 +59,7 @@ namespace TriggerAnalyticsEventXML
             xmlCopy.Schemas.Add("urn:milestone-systems", "AnalyticsEvent.xsd"); // AnalyticsEvent XSD
             xmlCopy.Schemas.Add("http://tempuri.org/Alert.xsd", "Alert.xsd");   // Alert XSD put in the sample enable the sending of this older format
             string analyticsXml = txtAnalyticsXML.Text;
-            analyticsXml = analyticsXml.Replace("$timestamp$", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:sszzz"));
+            analyticsXml = analyticsXml.Replace("$timestamp$", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"));
             try
             {            
                xmlCopy.LoadXml(analyticsXml);

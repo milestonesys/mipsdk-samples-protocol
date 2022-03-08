@@ -24,6 +24,7 @@ using VideoOS.Platform.Proxy.Alarm;
 // It makes a query every second and if the newest alarm is newer than any alarm seen before, a wav file is played
 // The sample also shows statistics about the total number of alarms per state in the database
 // To use the sample, you need to fill out the credentials settings according to your environment and set the "CurrentSetup" variable
+// The calls to the EventServer are in HTTP by default. In case EventServer runs with certificate, you need to change "_evsScheme" to HTTPS.
 // Environment: Windows, C#, .NET 4.0. No Milestone libraries required, WDSL generated client included as AlarmCommand.cs and AlarmCommandToken.cs
 //
 // ----------------------------------------------------------------------------------------------------------------------------------
@@ -47,6 +48,7 @@ namespace AlarmList
         private string _userName = null;
         private string _password = null;
         private string _domainName = null;
+        private string _evsScheme = null;
         private BasicConnection _basicLogin = null;
         private NtlmConnection _ntlmLogin = null;
         private LoginInfo _loginInfo;
@@ -169,6 +171,8 @@ namespace AlarmList
                     _domainName = CredentialCache.DefaultNetworkCredentials.Domain;
                     break;
             }
+
+            _evsScheme = Uri.UriSchemeHttp;
         }
         private void Login()
         {
@@ -241,7 +245,12 @@ namespace AlarmList
                     binding.ReaderQuotas.MaxDepth = MESSAGE_BUFFER_SIZE;
                     binding.ReaderQuotas.MaxStringContentLength = MESSAGE_BUFFER_SIZE;
 
-                    Uri uri = new UriBuilder(Uri.UriSchemeHttp, _hostName, port, "Central/AlarmServiceToken").Uri;
+                    Uri uri = new UriBuilder(_evsScheme, _hostName, port, "Central/AlarmServiceToken").Uri;
+                    if (uri.Scheme == Uri.UriSchemeHttps)
+                    {
+                        binding.Security.Mode = BasicHttpSecurityMode.Transport;
+                    }
+
                     string alarmServiceUri = uri.AbsoluteUri;
                     var endpointAddress = new EndpointAddress(alarmServiceUri);
 
@@ -268,6 +277,11 @@ namespace AlarmList
                 }
                 else
                 {
+                    var uri = new UriBuilder(_evsScheme, _hostName, port, "/Central/AlarmService2").Uri;
+                    var securityMode = uri.Scheme == Uri.UriSchemeHttps ?
+                        SecurityMode.TransportWithMessageCredential :
+                        SecurityMode.Message;
+
                     WSHttpBinding binding = new WSHttpBinding(SecurityMode.None);
                     binding.MaxReceivedMessageSize = MESSAGE_BUFFER_SIZE;
                     binding.MaxBufferPoolSize = MESSAGE_BUFFER_SIZE;
@@ -276,13 +290,13 @@ namespace AlarmList
                     binding.ReaderQuotas.MaxNameTableCharCount = MESSAGE_BUFFER_SIZE;
                     binding.ReaderQuotas.MaxDepth = MESSAGE_BUFFER_SIZE;
                     binding.ReaderQuotas.MaxStringContentLength = MESSAGE_BUFFER_SIZE;
-                    binding.Security.Mode = SecurityMode.Message;
+                    binding.Security.Mode = securityMode;
                     binding.Security.Transport.ClientCredentialType = HttpClientCredentialType.Windows;
                     binding.Security.Transport.ProxyCredentialType = HttpProxyCredentialType.None;
                     binding.Security.Message.ClientCredentialType = MessageCredentialType.Windows;
                     binding.Security.Message.EstablishSecurityContext = false;
                     binding.Security.Message.NegotiateServiceCredential = true;
-                    var uri = new UriBuilder(Uri.UriSchemeHttp, _hostName, port, "/Central/AlarmService2").Uri;
+
                     var endpointAddress = new EndpointAddress(uri, EndpointIdentity.CreateSpnIdentity(BasicConnection.SpnFactory.GetSpn(uri)));
 
                     _alarmCommandClient = new AlarmCommandClient(binding, endpointAddress);
