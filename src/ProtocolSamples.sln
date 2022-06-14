@@ -1,7 +1,7 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31613.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlarmList", "..\AlarmList\AlarmList.csproj", "{57B84090-BF8B-426A-B12C-DD7D78770120}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookmarkCreator", "..\BookmarkCreator\BookmarkCreator.csproj", "{78A2F3CA-7D2C-47C5-980C-4C529C6061F0}"
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "RestfulCommunicationPython", "..\RestfulCommunicationPython\RestfulCommunicationPython.pyproj", "{2BA5770A-5133-4454-8450-CC66BDD513E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OauthLoginFlow", "..\OauthLoginFlow\OauthLoginFlow.csproj", "{971B6B56-7A61-45D2-8AC7-9B5E50AE0A64}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +63,10 @@ Global
 		{78A2F3CA-7D2C-47C5-980C-4C529C6061F0}.Release|x64.Build.0 = Release|x64
 		{2BA5770A-5133-4454-8450-CC66BDD513E6}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{2BA5770A-5133-4454-8450-CC66BDD513E6}.Release|x64.ActiveCfg = Release|Any CPU
+		{971B6B56-7A61-45D2-8AC7-9B5E50AE0A64}.Debug|x64.ActiveCfg = Debug|x64
+		{971B6B56-7A61-45D2-8AC7-9B5E50AE0A64}.Debug|x64.Build.0 = Debug|x64
+		{971B6B56-7A61-45D2-8AC7-9B5E50AE0A64}.Release|x64.ActiveCfg = Release|x64
+		{971B6B56-7A61-45D2-8AC7-9B5E50AE0A64}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

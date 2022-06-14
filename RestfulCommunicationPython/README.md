@@ -26,7 +26,7 @@ The sample logs into the server, creates, gets, updates, and deletes a user-defi
 - Python version 3.6 or newer.
 - The Python package 'Requests'. To install 'Requests':
   - In a command prompt, enter `pip install requests`.
-  - In Visual Studio, select a Python environment, select the "Packages (PyPi)" view, and search for "requests".
+  - In Visual Studio Solution Explorer, select a Python environment under Python Environments, then from the context menu select Manage Python Packages and search for "requests".
 
 ## The sample demonstrates
 

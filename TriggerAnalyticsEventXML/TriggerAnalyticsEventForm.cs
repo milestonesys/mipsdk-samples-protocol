@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace TriggerAnalyticsEventXML
 {
@@ -29,7 +30,7 @@ namespace TriggerAnalyticsEventXML
             //Replace timestamp token with current time
             lblResponse.Text = "Socket response";
             string analyticsXml = txtAnalyticsXML.Text;
-            analyticsXml = analyticsXml.Replace("$timestamp$", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"));
+            analyticsXml = analyticsXml.Replace("$timestamp$", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture));
             // Sending the XML
             // Note the response is important, you can see whether the AnalyticsEvent was successfully received
             string response = SendXmlWithSocket(analyticsXml, txtDestinationAddress.Text, Convert.ToInt32(txtDestinationPort.Text));
@@ -59,7 +60,7 @@ namespace TriggerAnalyticsEventXML
             xmlCopy.Schemas.Add("urn:milestone-systems", "AnalyticsEvent.xsd"); // AnalyticsEvent XSD
             xmlCopy.Schemas.Add("http://tempuri.org/Alert.xsd", "Alert.xsd");   // Alert XSD put in the sample enable the sending of this older format
             string analyticsXml = txtAnalyticsXML.Text;
-            analyticsXml = analyticsXml.Replace("$timestamp$", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"));
+            analyticsXml = analyticsXml.Replace("$timestamp$", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture));
             try
             {            
                xmlCopy.LoadXml(analyticsXml);

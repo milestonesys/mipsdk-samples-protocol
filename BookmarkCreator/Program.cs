@@ -41,7 +41,7 @@ namespace BookmarkCreator
             /************************************************************
              * Beginning of program                                     *
              ************************************************************/
-            Console.WriteLine("Milestone SDK Bookmarks demo (XProtect Corporate only)");
+            Console.WriteLine("MIP SDK Bookmarks demo");
             Console.WriteLine("Creates 2 new bookmarks and retrieves them using ");
             Console.WriteLine("  1) BookmarkSearchTime ");
             Console.WriteLine("  2) BookmarkSearchFromBookmark");
