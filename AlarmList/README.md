@@ -12,11 +12,13 @@ title: Alarm List
 
 The AlarmList is a C\# .NET sample showing how to connect to an XProtect
 Event Server. When connected, the sample continuously queries the 10
-newest alarms, which matches a given filter. It also continuously
+newest alarms, which match a given filter. It also continuously
 reports the total number of alarms with any given state.
 
 The sample uses a WSDL client proxy which accesses the Event Server\'s
 alarm data.
+
+>Note, it is important to specify http or https in the server address, to ensure correct connection to a secure or unsecure Event Server.
 
 ![Alarm List](alarm_list.jpg)
 

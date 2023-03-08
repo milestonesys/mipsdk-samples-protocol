@@ -3,69 +3,102 @@
 const STUN_URL = "stun:stun1.l.google.com:19302";
 
 var pc, sessionId;
-var serverUrl, cameraId, token;
+var apiGatewayUrl, webRtcUrl, cameraId, token;
 var candidates = [];
+var refreshTimerId;
+
+var startTime, endTime;
+// Timeout in milliseconds for polling API Gateway
+const pollingTimeout = 20;
+
 
 async function start() {
+    startTime = Date.now();
+
     if (pc != null) await pc.close();
 
-    serverUrl = document.getElementById("serverUrl").value;
+    apiGatewayUrl = document.getElementById("apiGatewayUrl").value;
+    if (apiGatewayUrl.slice(-1) == '/')
+        apiGatewayUrl = apiGatewayUrl.slice(0, -1);
+    webRtcUrl = apiGatewayUrl + "/REST/v1/WebRTC";
     cameraId = document.getElementById("cameraId").value;
-    token = document.getElementById("token").value;
-    
+
+    await login();
+
     pc = new RTCPeerConnection({ iceServers: [{ urls: STUN_URL }] });
 
     pc.ontrack = evt => document.querySelector('#videoCtl').srcObject = evt.streams[0];
     pc.onicecandidate = evt => evt.candidate && sendIceCandidate(JSON.stringify(evt.candidate));
-    pc.onconnectionstatechange = () => {
-        if (pc.connectionState === 'connected') {
-            console.log('Peers connected')
-        }
-        else {
-            console.log('Connection state changed: ' + pc.connectionState)
-        }
-    }
 
     // Diagnostics
-    pc.onicegatheringstatechange = () => console.log("onicegatheringstatechange: " + pc.iceGatheringState);
-    pc.oniceconnectionstatechange = () => console.log("oniceconnectionstatechange: " + pc.iceConnectionState);
-    pc.onsignalingstatechange = () => console.log("onsignalingstatechange: " + pc.signalingState);
+    pc.onconnectionstatechange = () => {
+        log("Connection state", pc.connectionState);
+        if (pc.connectionState === "failed") {
+            closePeer();
+        }
+
+        if (pc.connectionState === "connected") {
+            endTime = Date.now();
+            log(`Establishing connection time: ${endTime - startTime} ms`);
+        }
+    }
+    pc.oniceconnectionstatechange = () => log("ICE connection state", pc.iceConnectionState);
+    pc.onicegatheringstatechange = () => log("ICE gathering state", pc.iceGatheringState);
+    pc.onsignalingstatechange = () => log("Signaling state", pc.signalingState);
 		
     initiateWebRTCSession();
 }
 
 async function closePeer() {
     await pc.close();
+    document.querySelector('#videoCtl').srcObject = null;
+    clearAnyRefreshTimers();
 };
+
+function log() {
+    let diagnostics = document.getElementById('diagnostics');
+    let argumentsArray = Array.prototype.slice.call(arguments);
+    let logMessage = argumentsArray.join(': ');
+    diagnostics.innerHTML += logMessage + '<br>';
+}
 
 async function initiateWebRTCSession() {
     try {
         // Initiate WebRTC session on the server
         const body = { cameraId: cameraId, resolution: "notInUse" };
-        const response = await fetch(serverUrl + "/WebRTC/v1/WebRTCSession", {
+        await fetch(webRtcUrl + "/Session", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify(body),
+            
+        }).then(async function (response)
+        {
+            await checkResponse(response);
+
+            var sessionData = await response.json();
+            sessionId = sessionData["sessionId"];
+
+            // Update answerSDP value on the server
+            await pc.setRemoteDescription(JSON.parse(sessionData["offerSDP"]));
+            console.log("remote sdp:\n" + pc.remoteDescription.sdp);
+            pc.createAnswer()
+                .then((answer) => pc.setLocalDescription(answer))
+                .then(() => console.log("local sdp:\n" + pc.localDescription.sdp))
+                .then(() => updateAnswerSDP(JSON.stringify(pc.localDescription)));
+
+            // Add server ICE candidates
+            addServerIceCandidates();
+
+            console.log('InitiateWebRTCSession end');
+            return;
+        }).catch(function (error) {
+            var msg = "Failed to initiate WebRTC session - " + error;
+            console.log(msg);
+            log(msg);
         });
-        const json = await response.json();
-        sessionId = json["sessionId"];
-
-        // Update answerSDP value on the server
-        await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(json["offerSDP"])));
-        console.log("remote sdp:\n" + pc.remoteDescription.sdp);
-        pc.createAnswer()
-            .then((answer) => pc.setLocalDescription(answer))
-            .then(() => updateAnswerSDP(json, JSON.stringify(pc.localDescription)));
-        console.log("local description:\n" + pc.setLocalDescription);
-
-        // Add server Ice candidates
-        addServerIceCandidates();
-
-        console.log('InitiateWebRTCSession end');
-        return;
     }
     catch (error) {
         console.log(error);
@@ -73,120 +106,106 @@ async function initiateWebRTCSession() {
     }
 }
 
-async function updateAnswerSDP(data, localDescription) {
-    try {
-        data["answerSDP"] = localDescription;
-        const response = await fetch(serverUrl + "/WebRTC/v1/WebRTCSession", {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify(data)
-        });
+async function updateAnswerSDP(localDescription) {
+    var patchAnswerSDPData = {
+        'answerSDP': localDescription
+    };
+
+    await fetch(webRtcUrl + "/Session/" + sessionId, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(patchAnswerSDPData)
+    }).then(async function (response) {
+        await checkResponse(response);
 
         if (await response.ok) {
-            console.log('AnswerSDP updated sucessfully');
+            console.log('AnswerSDP updated successfully');
         }
 
         const json = response.json();
         console.log('Updated WebRTC session object: ' + json);
         return json;
-    }
-    catch (error) {
-        console.log(error);
-        return error;
-    }
+    }).catch(function(error){
+        var msg = "Failed to update session with answerSDP - " + error;
+        console.log(msg);
+        log(msg);
+    });
 }
 
+// Polling API Gateway to get remote ICE candidates
 async function addServerIceCandidates() {
-    try {
-        const response = await fetch(serverUrl + "/WebRTC/v1/IceCandidates/" + sessionId, {
+    if (pc.iceConnectionState == "new" ||
+        pc.iceConnectionState == "checking") {
+
+        await fetch(webRtcUrl + "/IceCandidates/" + sessionId, {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + token
             }
-        });
+        }).then(async function (response) {
+            await checkResponse(response);
 
-        const json = await response.json();
-        for (const element of json["candidates"]) {
-            if (!candidates.includes(element)) {
-                console.log("Ice candidate data: " + element);
-                candidates.push(element);
-                var obj = JSON.parse(element);
-                await pc.addIceCandidate(obj);
+            const json = await response.json();
+            for (const element of json["candidates"]) {
+                if (!candidates.includes(element)) {
+                    console.log("ICE candidate data: " + element);
+                    candidates.push(element);
+                    var obj = JSON.parse(element);
+                    await pc.addIceCandidate(obj);
+                }
             }
-        }
 
-        if (pc.iceConnectionState == "new" ||
-            pc.iceConnectionState == "checking") {
-            setTimeout(addServerIceCandidates, 20);
-        }
-        return;
-    }
-    catch (error) {
-        console.log(error);
-        return error;
+        }).catch(function (error) {
+            var msg = "Failed to retrieve ICE candidate from server - " + error;
+            console.log(msg);
+            log(msg);
+        });
     }
 }
 
 async function sendIceCandidate(candidate) {
-    try {
-        const body = { sessionId: sessionId, candidates: [candidate] };
-        const response = await fetch(serverUrl + "/WebRTC/v1/IceCandidates", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify(body)
-        });
+    const body = { candidates: [candidate] };
 
-        if (await response.ok) {
-            console.log('Client candidates sent successfully');
-        }
+    await fetch(webRtcUrl + "/IceCandidates/" + sessionId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(body)
+    }).then(async function (response) {
 
-        return;
+        await checkResponse(response);
+
+        console.log('Client candidates sent successfully');
+    }).catch (function (error) {
+        var msg = "Failed to send ICE candidate - " + error;
+        console.log(msg);
+        log(msg);
+    });
+}
+
+async function checkResponse(response) {
+    if (!response.ok) {
+        var errorInfo = await response.json();
+        throw Error(errorInfo);
     }
-    catch (error) {
-        console.log(error);
-        return error;
-    }
+    return true;
 }
 
 async function login() {
     if(pc != null) await pc.close();
 
     try {
-        var idpserver = document.getElementById("idpserver").value;
-        var username = document.getElementById("username").value;
-        var password = document.getElementById("password").value;
-
-        var lastchar = idpserver.substr(idpserver.length -1);
-        if(lastchar != "/") {
-            idpserver += "/";
-        }
-        var final = idpserver + "IDP/connect/token";
-
-        var urlencoded = new URLSearchParams();
-            urlencoded.append("grant_type", "password");
-            urlencoded.append("username", username);
-            urlencoded.append("password", password);
-            urlencoded.append("client_id", "GrantValidatorClient");
-
-        const response = await fetch(final, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: urlencoded,
-        });
-        const json = await response.json();
-        token = json["access_token"];
-        document.getElementById("token").value = token;
+        token = await getToken();
         return;
     } catch (error) {
         console.log(error);
         return error;
     }
 }
+
+

@@ -171,14 +171,13 @@ namespace AlarmList
                     _domainName = CredentialCache.DefaultNetworkCredentials.Domain;
                     break;
             }
-
-            _evsScheme = Uri.UriSchemeHttp;
         }
         private void Login()
         {
             Uri uri = new UriBuilder(_address).Uri;
             _hostName = uri.Host;
             _port = uri.Port;
+            _evsScheme = uri.Scheme;
             if (_isBasicUser)
             {
                 _basicLogin = new BasicConnection(_userName, _password, _hostName, _management_server_ssl_port);

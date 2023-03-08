@@ -1,0 +1,42 @@
+body {
+    font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+}
+
+video {
+    margin-bottom: 20px;
+    width: 640px;
+    height: 480px;
+    display: inline-block;
+}
+
+div.input {
+    margin-bottom: 10px;
+}
+
+div.buttons {
+    margin-left: 140px;
+}
+
+label {
+    display: inline-block;
+    width: 140px;
+    text-align: right;
+}
+
+input:blank:invalid {
+    border: 1px solid black;
+}
+
+input:invalid {
+    border: 1px solid red;
+}
+
+#diagnostics {
+    border: 1px solid #D3D3D3;
+    width: 300px;
+    height: 480px;
+    display: inline-block;
+    vertical-align: top;
+    resize: both;
+    overflow: auto;
+}

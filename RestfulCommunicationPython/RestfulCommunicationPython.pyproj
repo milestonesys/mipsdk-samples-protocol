@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>2ba5770a-5133-4454-8450-cc66bdd513e6</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>RestfulCommunicationPython.py</StartupFile>
+    <StartupFile>restful_communication.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -28,7 +28,7 @@
     <Compile Include="identity_provider.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="RestfulCommunicationPython.py" />
+    <Compile Include="restful_communication.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.7" />

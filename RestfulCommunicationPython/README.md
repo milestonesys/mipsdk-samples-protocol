@@ -11,7 +11,7 @@ title: RESTful Communication - Python
 
 # RESTful Communication - Python
 
-This sample shows how to use the RESTful API Gateway from a Python application. It demonstrates basic CRUD operations, as well as asynchronously invoking a task, and checking up on the task status.
+This sample shows how to use the RESTful API Gateway from a Python application. It demonstrates basic CRUD operations, asynchronously invoking a task, checking up on the task status, and duplicating a rule.
 
 The sample logs into the server, creates, gets, updates, and deletes a user-defined event, with diagnostic output along the way. In addition, it shows how to retrieve a list of cameras, and perform a task on one of these cameras.
 

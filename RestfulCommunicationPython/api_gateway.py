@@ -20,6 +20,7 @@ class Gateway:
         """
         self._serverUrl = serverUrl
 
+
     def get(self, session: requests.Session, resource_plural: str, token: str) -> requests.Response:
         """Retrieves a list of items.
 
@@ -32,6 +33,7 @@ class Gateway:
         """
         url = self.__url(resource_plural)
         return self.__request(session, 'GET', url, token)
+
 
     def get_single(self, session: requests.Session, resource_plural: str, obj_id: str, token: str) -> requests.Response:
         """Retrieves a single item by id.
@@ -47,6 +49,7 @@ class Gateway:
         url = self.__url(resource_plural, obj_id=obj_id)
         return self.__request(session, 'GET', url, token)
 
+
     def get_child_items(self, session: requests.Session, resource_plural: str, obj_id: str, child_item_type: str, token: str) -> requests.Response:
         """Gets a list of child items of a specific item.
 
@@ -61,6 +64,7 @@ class Gateway:
         """
         url = self.__url(resource_plural, obj_id=obj_id, child_item_type=child_item_type)
         return self.__request(session, 'GET', url, token)
+
 
     def get_child_item_tasks(self, session: requests.Session, resource_plural: str, obj_id: str, child_item_type: str, token: str) -> requests.Response:
         """Gets a list of tasks available on a specific child item type of a specific item
@@ -81,6 +85,7 @@ class Gateway:
             }
         return self.__request(session, 'GET', url, token, params=params)
 
+
     def get_tasks(self, session: requests.Session, resource_plural: str, token: str) -> requests.Response:
         """Gets a list of tasks available on a specific item type.
 
@@ -97,6 +102,7 @@ class Gateway:
             'noData': None
             }
         return self.__request(session, 'GET', url, token, params=params)
+
 
     def perform_task(self, session: requests.Session, resource_plural: str, obj_id: str, task: str, payload: str, token: str) -> requests.Response:
         """Invokes a task on a specific item. 
@@ -119,6 +125,7 @@ class Gateway:
             'task': task
             }
         return self.__request(session, 'POST', url, token, params=params, payload=payload)
+
 
     def perform_child_task(self, session: requests.Session, resource_plural: str, obj_id: str, child_item_type: str, task: str, payload: str, token: str) -> requests.Response:
         """Performs a child item type based task on a specific item.
@@ -143,6 +150,7 @@ class Gateway:
             }
         return self.__request(session, 'POST', url, token, params=params, payload=payload)
 
+
     def create_item(self, session: requests.Session, resource_plural: str, payload: str, token: str) -> requests.Response:
         """Creates an item on the server.
 
@@ -156,6 +164,7 @@ class Gateway:
         """
         url = url = self.__url(resource_plural)
         return self.__request(session, 'POST', url, token, payload=payload)
+
 
     def update_item(self, session: requests.Session, resource_plural: str, payload: str, obj_id: str, token: str) -> requests.Response:
         """Updates an item.
@@ -172,6 +181,7 @@ class Gateway:
         url = url = self.__url(resource_plural, obj_id=obj_id)
         return self.__request(session, 'PUT', url, token, payload=payload)
 
+
     def delete_item(self, session: requests.Session, resource_plural: str, obj_id: str, token: str) -> requests.Response:
         """Deletes an item.
 
@@ -185,6 +195,7 @@ class Gateway:
         """
         url = self.__url(resource_plural, obj_id=obj_id)
         return self.__request(session, 'DELETE', url, token)
+
 
     def __request(self, session: requests.Session, verb: str, url: str, token: str, params: dict = {}, payload: str = '') -> requests.Response:
         """Submits request through session using bearer token.
@@ -221,6 +232,7 @@ class Gateway:
         except requests.exceptions.RequestException as err:
             raise SystemExit(err)
         return res
+
 
     def __url(self, resource_plural: str, obj_id: str = None, child_item_type: str = None):
         """Formats request URI.

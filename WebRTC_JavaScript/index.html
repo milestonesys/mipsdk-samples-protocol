@@ -1,72 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <title>Realtime communication with WebRTC</title>
+<head>
+    <title>Live video streaming with WebRTC</title>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
     <script src="js/main.js"></script>
-    <style>
-      body {
-        font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
-      }
-      video {
-        margin-bottom: 20px;
-      }
-      div.input {
-        margin-bottom: 10px;
-      }
-      div.buttons {
-        margin-left: 140px;
-      }
-      label {
-        display: inline-block;
-        width: 140px;
-        text-align: right;
-      }
-      input:blank:invalid {
-        border: 1px solid black;
-      }
-      input:invalid {
-        border: 1px solid red;
-      }
-    </style>
-  </head>
+    <script src="js/tokenCommunication.js"></script>
+    <link rel="stylesheet" href="css/main.css">
+</head>
   <body>
-    <h1>Realtime communication with WebRTC</h1>
-    <video controls="controls" autoplay="autoplay" id="videoCtl" width="640" height="480"></video>
-    <form>
-      <div class="input">
-        <label for="serverUrl">API Gateway URL:</label>
-        <input type="url" id="serverUrl" name="serverUrl" size="42" placeholder="https://apigatewayserver.example.com/api"/>
+      <h1>Live video streaming with WebRTC</h1>
+      <div>
+          <video id="videoCtl" controls="controls" autoplay="autoplay"></video>
+          <div id="diagnostics">
+              <h4>Diagnostics log</h4>
+          </div>
       </div>
-      <div class="input">
-        <label for="cameraId">CameraId:</label>
-        <input type="text" id="cameraId" name="cameraId" size="42" pattern="^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$" placeholder="A364956F-39A5-4CBC-9FFE-55B0C802CA77"/>
+      <div>
+          <div>
+              <div class="input">
+                  <label for="apiGatewayUrl">API Gateway URL:</label>
+                  <input type="url" id="apiGatewayUrl" name="apiGatewayUrl" size="42" placeholder="https://apigatewayserver.example.com/api"/>
+              </div>
+              <div class="input">
+                  <label for="cameraId">CameraId:</label>
+                  <input type="text" id="cameraId" name="cameraId" size="42" pattern="^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$" placeholder="A364956F-39A5-4CBC-9FFE-55B0C802CA77" />
+              </div>
+              <br>
+              <div class="input">
+                  <label for="username">Username:</label>
+                  <input type="text" id="username" name="username" placeholder="username" />
+              </div>
+              <div class="input">
+                  <label for="password">Password:</label>
+                  <input type="password" id="password" name="password" placeholder="password" />
+              </div>
+          </div>
       </div>
-      <br/>
-      <div class="input">
-        <label for="token">Token:</label>
-        <textarea id="token" name="token" rows="4" cols="50">Paste OAuth2 token here or log in (basic user only)</textarea>
+      <br><br>
+      <div class="buttons">
+          <button onclick="start()">Start</button>
+          <button onclick="closePeer()">Close</button>
       </div>
-      <div class="input">
-        <label for="idpserver">Management server:</label>
-        <input type="url" id="idpserver" name="idpserver" size="42" placeholder="https://managementserver.example.com/"/>
-      </div>
-      <div class="input">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" placeholder="username"/>
-      </div>
-      <div class="input">
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="password"/>
-      </div>
-    </form>
-    <div class="buttons">
-      <button onclick="login()">Login</button>
-    </div>
-    <br/><br/>
-    <div class="buttons">
-      <button onclick="start()">Start</button>
-      <button onclick="closePeer()">Close</button>
-    </div>
   </body>
 </html>

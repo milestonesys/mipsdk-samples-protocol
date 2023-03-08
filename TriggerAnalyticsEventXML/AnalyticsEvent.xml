@@ -18,6 +18,11 @@
       <!-- (For multichannel devices, URI may contain channel number after ',') -->
       <Name>192.168.0.199</Name>
 
+<!--      <FQID>  -->
+<!-- Insert camera GUID here, if you have it -->
+<!--<ObjectId>068680AB-5350-4AC7-A47E-652300B16252</ObjectId>-->
+<!--      </FQID> -->
+        
     </Source>
   </EventHeader>
 

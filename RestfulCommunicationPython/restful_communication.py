@@ -2,7 +2,9 @@ import json
 import requests
 import time
 import identity_provider
+import uuid
 from api_gateway import Gateway
+
 
 def main():
     username = 'basicUserName' # Replace with an XProtect basic user with the XProtect Administrators role
@@ -28,9 +30,9 @@ def main():
 
 
     # Demo of creating, updating, and deleting a user-defined event through the API Gateway
-    crud_user_defined_event(api_gateway, session, access_token)
+    crud_user_defined_event(api_gateway, session, access_token)        
 
-    
+
     # Demo of invoking a task through the API Gateway
     # NOTE To run the tasks demonstration below, the GUID of a PTZ camera is needed
     # 1. In Management Client, find a PTZ camera 
@@ -50,6 +52,10 @@ def main():
     # cameras_and_tasks(api_gateway, session, access_token, cameraGuidId)
 
 
+    # Demo duplicating a rule
+    # Find ruleId by calling /rules and pick the id of the rule that should be duplicated
+    # ruleId = '[guid of the rule to duplicate]'
+    # duplicate_rule(api_gateway, session, access_token, ruleId)
 def crud_user_defined_event(api_gateway: Gateway, session: requests.Session, token: str):
     """Create, update, and delete a user-defined event"""
 
@@ -151,6 +157,36 @@ def cameras_and_tasks(api_gateway: Gateway, session: requests.Session, token: st
     if response.status_code == 200:
         task_result = response.json()['result']
         print(f"TaskCleanup task result:\n{task_result}\n\n")
+    else:
+        error = response.json()['error']
+        print(error)
+        return
+
+
+def duplicate_rule(api_gateway: Gateway, session: requests.Session, token: str, ruleId):
+    """Get a rule, update name and id, then create a duplicate"""
+
+    # Get rule through REST
+    original_rule = ""
+    response = api_gateway.get_single(session, 'rules', ruleId, token)
+    if response.status_code == 200:
+        original_rule = response.json()['data']
+        print(f"Rule to duplicate result:\n{original_rule}\n\n")
+    else:
+        error = response.json()['error']
+        print(error)
+        return
+
+    # Modify the rule
+    original_rule["name"] = "Copy of " + original_rule["name"]
+    original_rule["id"] = str(uuid.uuid4())
+
+    # Create the duplicate rule
+    create_rule_payload = json.dumps(original_rule)
+    response = api_gateway.create_item(session, 'rules', create_rule_payload, token)
+    if response.status_code == 201:
+        original_rule = response.json()['result']
+        print(f"Duplicate rule created result:\n{original_rule}\n\n")
     else:
         error = response.json()['error']
         print(error)

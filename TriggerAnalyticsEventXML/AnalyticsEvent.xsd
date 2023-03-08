@@ -126,18 +126,20 @@ version="1.0">
       </xs:element>
       <!-- The ID of the parent if applicable, e.g. recorder ID for cameras, or camera ID for PTZ Presets. -->
       <xs:element minOccurs="0" maxOccurs="1" name="ParentId" type="GUID" />
-      
+
+      <xs:choice>
       <!-- The ID of the item itself (except for Presets, see below). -->
-      <xs:element minOccurs="0" maxOccurs="1" name="ObjectId" type="GUID" />
+      <xs:element name="ObjectId" type="GUID" />
       
       <!-- The ID of the item, when the ID is not a GUID, e.g. a preset. -->
-      <xs:element minOccurs="0" maxOccurs="1" name="ObjectIdString" type="xs:string" />
-      
+      <xs:element name="ObjectIdString" type="xs:string" />
+      </xs:choice>
+        
       <!-- Defines if this object is a folder, e.g. contains children:
            0: No
            1: SystemDefined
            2: UserDefined -->
-      <xs:element minOccurs="1" maxOccurs="1" name="FolderType" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" maxOccurs="1" name="FolderType" type="xs:unsignedByte" />
       
       <!-- The type identifier of this item. The most common item kinds have been predefined in  VideoOS.Platform.Kind:
            3B25FE94-7C2F-499a-86DF-2FA68AA3E1B5: Server
@@ -155,7 +157,7 @@ version="1.0">
            84ED10D8-D5BC-4785-9C8E-F84440218F24: View
            15DA80D4-7595-431f-9866-674D2B80ACC5: Window
            BBB64F9C-E3C7-41d4-A77E-D488390D7FCB: Screen -->
-      <xs:element minOccurs="1" maxOccurs="1" name="Kind" type="GUID" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Kind" type="GUID" />
     </xs:sequence>
   </xs:complexType>
   

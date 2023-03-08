@@ -75,7 +75,7 @@
             <Grid Grid.Column="0">
                 <DockPanel>
                     <Button Name="_buttonGo" Width="60" DockPanel.Dock="Right" Click="Button_Click_Go" Background="#FF7A8EEF">Go</Button>
-                    <TextBox Name="_textBoxServer" DockPanel.Dock="Left" Text="localhost"></TextBox>
+                    <TextBox Name="_textBoxServer" DockPanel.Dock="Left" Text="http://localhost"></TextBox>
                 </DockPanel>
             </Grid>
             <Grid Grid.Column="1">
