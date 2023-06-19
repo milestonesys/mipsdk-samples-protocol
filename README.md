@@ -26,7 +26,7 @@ This repo contains samples that demonstrate MIP SDK protocol integration:
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | Alarm List                      | How to retrieve a short list of already generated alarms from the event server.                                                     |
 | Bookmark Creator                | How bookmarks can be created, maintained and deleted via SOAP protocol.                                                             |
-| Login .Net SOAP                 | The most simple C\# code for performing a login.                                                                                    |
+| Login .NET SOAP                 | The most simple C\# code for performing a login.                                                                                    |
 | OAuth Login Flow                | How to log in as a user managed by an external identity provider, for example Okta.                                                 |
 | RESTful Communication - Python  | How to log in and use the RESTful API Gateway from a Python application.                                                            |
 | TCP Video Viewer                | How to utilize the ImageServer protocol to retrieve a sequence of images.                                                           |

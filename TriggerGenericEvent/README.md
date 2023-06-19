@@ -27,26 +27,26 @@ The following screenshot shows the options for command line parameters.
 
 ## The sample demonstrates
 
--   How to send a character string to the XProtect Generic Event
-    interpreter.
+- How to send a character string to the XProtect Generic Event
+  interpreter.
 
 ## Using
 
--   Standard Windows .NET sockets
+- Standard Windows .NET sockets
 
 ## Environment
 
--   None
+- None
 
 ## Visual Studio C\# project
 
--   [TriggerGenericEvent.csproj](javascript:openLink('..\\\\ProtocolSamples\\\\TriggerGenericEvent\\\\TriggerGenericEvent.csproj');)
+- [TriggerGenericEvent.csproj](javascript:clone('https://github.com/milestonesys/mipsdk-samples-protocol','src/ProtocolSamples.sln');)
 
 ## Special notes
 
 Also investigate this sample:
 
--   [TriggerGenericEventStream.csproj](javascript:openLink('..\\\\ProtocolSamples\\\\TriggerGenericEventStream\\\\TriggerGenericEventStream.csproj');)
+- [TriggerGenericEventStream.csproj](javascript:clone('https://github.com/milestonesys/mipsdk-samples-protocol','src/ProtocolSamples.sln');)
 
 Also note that the configuration performed by the Management Client can
 modify the port and character set used for this transmission.

@@ -25,20 +25,22 @@ camera, as well as the recording server port.
 The readable part of the protocol communication is displayed in the
 console window.
 
+For information about login, please refer to <a href="https://doc.developer.milestonesys.com/html/index.html?base=gettingstarted/gettingstarted/intro_environments_login.html&tree=tree_4.html"  target="_blank">Introduction to MIP Environments and Login</a>
+
 ## The sample demonstrates
 
--   Use of ServerCommandService for performing login
--   Formatting of XML on the ImageServer protocol.
+- Use of ServerCommandService for performing login
+- Formatting of XML on the ImageServer protocol.
 
 ## Using
 
--   ServerCommandService proxy
--   ImageServer protocol
+- ServerCommandService proxy
+- ImageServer protocol
 
 ## Environment
 
--   None
+- None
 
 ## Visual Studio C\# project
 
--   [LoginDotNetSoap.csproj](javascript:openLink('..\\\\ProtocolSamples\\\\LoginDotNetSoap\\\\LoginDotNetSoap.csproj');)
+- [LoginDotNetSoap.csproj](javascript:clone('https://github.com/milestonesys/mipsdk-samples-protocol','src/ProtocolSamples.sln');)

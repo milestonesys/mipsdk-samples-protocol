@@ -27,26 +27,26 @@ The following screenshot shows the UI.
 
 ## The sample demonstrates
 
--   How to send a stream of characters encoded as UTF-8 to the XProtect
-    Generic Event interpreter.
+- How to send a stream of characters encoded as UTF-8 to the XProtect
+  Generic Event interpreter
 
 ## Using
 
--   Standard Windows .NET sockets
+- Standard Windows .NET sockets
 
 ## Environment
 
--   None
+- None
 
 ## Visual Studio C\# project
 
--   [TriggerGenericEventStream.csproj](javascript:openLink('..\\\\ProtocolSamples\\\\TriggerGenericEventStream\\\\TriggerGenericEventStream.csproj');)
+- [TriggerGenericEventStream.csproj](javascript:clone('https://github.com/milestonesys/mipsdk-samples-protocol','src/ProtocolSamples.sln');)
 
 ## Special notes
 
 For sending single events at a time, you may investigate this sample:
 
--   [TriggerGenericEvent.csproj](javascript:openLink('..\\\\ProtocolSamples\\\\TriggerGenericEvent\\\\TriggerGenericEvent.csproj');)
+- [TriggerGenericEvent.csproj](javascript:clone('https://github.com/milestonesys/mipsdk-samples-protocol','src/ProtocolSamples.sln');)
 
 Also note that the configuration performed by the Management Client can
 modify the port and character set used for this transmission.

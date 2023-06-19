@@ -25,21 +25,21 @@ viewing in live mode and when retrieving recorded images.
 
 ## The sample demonstrates
 
--   How to utilize the Image Server protocol for retrieving recorded
-    images
--   How to utilize the Image Server protocol for viewing live video
--   How to ask recording server to transcode all frames to JPEG,
-    regardless of original codec
--   Usage of XML formatting on the Image Server protocol
+- How to utilize the Image Server protocol for retrieving recorded
+  images
+- How to utilize the Image Server protocol for viewing live video
+- How to ask recording server to transcode all frames to JPEG,
+  regardless of original codec
+- Usage of XML formatting on the Image Server protocol
 
 ## Using
 
--   ImageServer protocol
+- ImageServer protocol
 
 ## Environment
 
--   None
+- None
 
 ## Visual Studio C\# project
 
--   [TcpVideoViewer.csproj](javascript:openLink('..\\\\ProtocolSamples\\\\TcpVideoViewer\\\\TcpVideoViewer.csproj');)
+- [TcpVideoViewer.csproj](javascript:clone('https://github.com/milestonesys/mipsdk-samples-protocol','src/ProtocolSamples.sln');)

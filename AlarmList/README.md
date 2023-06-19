@@ -24,19 +24,19 @@ alarm data.
 
 ## The sample demonstrates
 
--   How to connect to XProtect Event Server with different credentials
--   Query 10 alarms matching a filter
--   Query statistics about all alarms
--   Alarm list view with WPF
+- How to connect to XProtect Event Server with different credentials
+- Query 10 alarms matching a filter
+- Query statistics about all alarms
+- Alarm list view with WPF
 
 ## Using
 
--   Microsoft.NET
+- Microsoft.NET
 
 ## Environment
 
--   C\#, WPF and .NET
+- C\#, WPF and .NET
 
 ## Visual Studio C\# project
 
--   [AlarmList.csproj](javascript:openLink('..\\\\ProtocolSamples\\\\AlarmList\\\\AlarmList.csproj');)
+- [AlarmList.csproj](javascript:clone('https://github.com/milestonesys/mipsdk-samples-protocol','src/ProtocolSamples.sln');)

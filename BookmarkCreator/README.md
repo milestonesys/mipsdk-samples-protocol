@@ -20,28 +20,27 @@ Professional+.
 After the login is successful, it will automatically perform these
 bookmark operations:
 
--   Create first bookmark
--   Create a second bookmark
--   Looking for bookmarks using BookmarkSearchTime
--   Looking for bookmarks using bookmarkListsFromBookmark
--   Looking for the first bookmarks using BookmarkGet
--   Deleting the 2 newly created bookmarks
+- Create first bookmark
+- Create a second bookmark
+- Looking for bookmarks using BookmarkSearchTime
+- Looking for bookmarks using bookmarkListsFromBookmark
+- Looking for the first bookmarks using BookmarkGet
+- Deleting the 2 newly created bookmarks
 
 ## MIP Environment - Protocol
 
 ## The sample demonstrates
 
--   Use of ServerCommandService for performing bookmark create, get and
-    delete
+- Use of ServerCommandService for performing bookmark create, get and delete
 
 ## Using
 
--   ServerCommandService proxy
+- ServerCommandService proxy
 
 ## Environment
 
--   None
+- None
 
 ## Visual Studio C\# project
 
--   [BookmarkCreator.csproj](javascript:openLink('..\\\\ProtocolSamples\\\\BookmarkCreator\\\\BookmarkCreator.csproj');)
+- [BookmarkCreator.csproj](javascript:clone('https://github.com/milestonesys/mipsdk-samples-protocol','src/ProtocolSamples.sln');)

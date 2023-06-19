@@ -11,6 +11,7 @@ def get_token(
     password: str,
     serverUrl: str,
     isBasicUser: bool,
+    verify: bool
 ) -> str:
     """
     Requests an OAuth 2.0 access token from the identity provider on a VMS server for a VMS user.
@@ -30,22 +31,21 @@ def get_token(
     """
 
     if isBasicUser:
-        return get_token_basic(session, username, password, serverUrl)
-    else:
-        return get_token_windows(session, username, password, serverUrl)
+        return get_token_basic(session, username, password, serverUrl, verify)
+    return get_token_windows(session, username, password, serverUrl, verify)
 
 
 def get_token_basic(
-    session: requests.Session, username: str, password: str, serverUrl: str
+    session: requests.Session, username: str, password: str, serverUrl: str, verify: bool
 ) -> str:
     url = f"{serverUrl}/API/IDP/connect/token"
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     payload = f"grant_type=password&username={username}&password={password}&client_id=GrantValidatorClient"
-    return session.request("POST", url, headers=headers, data=payload, verify=False)
+    return session.request("POST", url, headers=headers, data=payload, verify=verify)
 
 
 def get_token_windows(
-    session: requests.Session, username: str, password: str, serverUrl: str
+    session: requests.Session, username: str, password: str, serverUrl: str, verify: bool
 ) -> str:
     # Get the token directly from the identity provider as MIP VMS RESTful API gateway doesn't support pass-through of NTLM authentication
     url = f"{serverUrl}/IDP/connect/token"
@@ -56,6 +56,6 @@ def get_token_windows(
         url,
         headers=headers,
         data=payload,
-        verify=False,
+        verify=verify,
         auth=HttpNtlmAuth(username, password),
     )

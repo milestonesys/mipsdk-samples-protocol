@@ -13,6 +13,7 @@ class Gateway:
     """
     Class representing API Gateway.
     """
+
     def __init__(self, serverUrl: str):
         """Constructor
 
@@ -20,8 +21,9 @@ class Gateway:
         """
         self._serverUrl = serverUrl
 
-
-    def get(self, session: requests.Session, resource_plural: str, token: str) -> requests.Response:
+    def get(
+        self, session: requests.Session, resource_plural: str, token: str
+    ) -> requests.Response:
         """Retrieves a list of items.
 
         :param session: A requests.Session object which will be used for the duration of the
@@ -32,10 +34,11 @@ class Gateway:
         :returns: requests.Response object.
         """
         url = self.__url(resource_plural)
-        return self.__request(session, 'GET', url, token)
+        return self.__request(session, "GET", url, token)
 
-
-    def get_single(self, session: requests.Session, resource_plural: str, obj_id: str, token: str) -> requests.Response:
+    def get_single(
+        self, session: requests.Session, resource_plural: str, obj_id: str, token: str
+    ) -> requests.Response:
         """Retrieves a single item by id.
 
         :param session: A requests.Session object which will be used for the duration of the
@@ -47,10 +50,16 @@ class Gateway:
         :returns: requests.Response object
         """
         url = self.__url(resource_plural, obj_id=obj_id)
-        return self.__request(session, 'GET', url, token)
+        return self.__request(session, "GET", url, token)
 
-
-    def get_child_items(self, session: requests.Session, resource_plural: str, obj_id: str, child_item_type: str, token: str) -> requests.Response:
+    def get_child_items(
+        self,
+        session: requests.Session,
+        resource_plural: str,
+        obj_id: str,
+        child_item_type: str,
+        token: str,
+    ) -> requests.Response:
         """Gets a list of child items of a specific item.
 
         :param session: A requests.Session object which will be used for the duration of the
@@ -62,11 +71,19 @@ class Gateway:
 
         :returns: requests.Response object
         """
-        url = self.__url(resource_plural, obj_id=obj_id, child_item_type=child_item_type)
-        return self.__request(session, 'GET', url, token)
+        url = self.__url(
+            resource_plural, obj_id=obj_id, child_item_type=child_item_type
+        )
+        return self.__request(session, "GET", url, token)
 
-
-    def get_child_item_tasks(self, session: requests.Session, resource_plural: str, obj_id: str, child_item_type: str, token: str) -> requests.Response:
+    def get_child_item_tasks(
+        self,
+        session: requests.Session,
+        resource_plural: str,
+        obj_id: str,
+        child_item_type: str,
+        token: str,
+    ) -> requests.Response:
         """Gets a list of tasks available on a specific child item type of a specific item
 
         :param session: A requests.Session object which will be used for the duration of the
@@ -78,15 +95,15 @@ class Gateway:
 
         :returns: requests.Response object. If success, the response body is a JSON object with a 'tasks' array
         """
-        url = self.__url(resource_plural, obj_id=obj_id, child_item_type=child_item_type)
-        params = {
-            'tasks': None,
-            'noData': None
-            }
-        return self.__request(session, 'GET', url, token, params=params)
+        url = self.__url(
+            resource_plural, obj_id=obj_id, child_item_type=child_item_type
+        )
+        params = {"tasks": None, "noData": None}
+        return self.__request(session, "GET", url, token, params=params)
 
-
-    def get_tasks(self, session: requests.Session, resource_plural: str, token: str) -> requests.Response:
+    def get_tasks(
+        self, session: requests.Session, resource_plural: str, token: str
+    ) -> requests.Response:
         """Gets a list of tasks available on a specific item type.
 
         :param session: A requests.Session object which will be used for the duration of the
@@ -97,15 +114,19 @@ class Gateway:
         :returns: Parsed list of available tasks
         """
         url = self.__url(resource_plural)
-        params = {
-            'tasks': None,
-            'noData': None
-            }
-        return self.__request(session, 'GET', url, token, params=params)
+        params = {"tasks": None, "noData": None}
+        return self.__request(session, "GET", url, token, params=params)
 
-
-    def perform_task(self, session: requests.Session, resource_plural: str, obj_id: str, task: str, payload: str, token: str) -> requests.Response:
-        """Invokes a task on a specific item. 
+    def perform_task(
+        self,
+        session: requests.Session,
+        resource_plural: str,
+        obj_id: str,
+        task: str,
+        payload: str,
+        token: str,
+    ) -> requests.Response:
+        """Invokes a task on a specific item.
 
         Technically invokes a task asynchronously, which may then be retrieved using the
         resource_plural "tasks" and the id supplied in the response.
@@ -121,13 +142,21 @@ class Gateway:
         :returns: requests.Response object
         """
         url = self.__url(resource_plural, obj_id=obj_id)
-        params = {
-            'task': task
-            }
-        return self.__request(session, 'POST', url, token, params=params, payload=payload)
+        params = {"task": task}
+        return self.__request(
+            session, "POST", url, token, params=params, payload=payload
+        )
 
-
-    def perform_child_task(self, session: requests.Session, resource_plural: str, obj_id: str, child_item_type: str, task: str, payload: str, token: str) -> requests.Response:
+    def perform_child_task(
+        self,
+        session: requests.Session,
+        resource_plural: str,
+        obj_id: str,
+        child_item_type: str,
+        task: str,
+        payload: str,
+        token: str,
+    ) -> requests.Response:
         """Performs a child item type based task on a specific item.
 
         Technically starts a task asynchronously, which may then be retrieved using the
@@ -144,14 +173,17 @@ class Gateway:
 
         :returns: requests.Response object.
         """
-        url = self.__url(resource_plural, obj_id=obj_id, child_item_type=child_item_type)
-        params = {
-            "task": task
-            }
-        return self.__request(session, 'POST', url, token, params=params, payload=payload)
+        url = self.__url(
+            resource_plural, obj_id=obj_id, child_item_type=child_item_type
+        )
+        params = {"task": task}
+        return self.__request(
+            session, "POST", url, token, params=params, payload=payload
+        )
 
-
-    def create_item(self, session: requests.Session, resource_plural: str, payload: str, token: str) -> requests.Response:
+    def create_item(
+        self, session: requests.Session, resource_plural: str, payload: str, token: str
+    ) -> requests.Response:
         """Creates an item on the server.
 
         :param session: A requests.Session object which will be used for the duration of the
@@ -163,10 +195,16 @@ class Gateway:
         :returns: requests.Response object
         """
         url = url = self.__url(resource_plural)
-        return self.__request(session, 'POST', url, token, payload=payload)
+        return self.__request(session, "POST", url, token, payload=payload)
 
-
-    def update_item(self, session: requests.Session, resource_plural: str, payload: str, obj_id: str, token: str) -> requests.Response:
+    def update_item(
+        self,
+        session: requests.Session,
+        resource_plural: str,
+        payload: str,
+        obj_id: str,
+        token: str,
+    ) -> requests.Response:
         """Updates an item.
 
         :param session: A requests.Session object which will be used for the duration of the
@@ -179,10 +217,11 @@ class Gateway:
         :returns: requests.Response object
         """
         url = url = self.__url(resource_plural, obj_id=obj_id)
-        return self.__request(session, 'PUT', url, token, payload=payload)
+        return self.__request(session, "PUT", url, token, payload=payload)
 
-
-    def delete_item(self, session: requests.Session, resource_plural: str, obj_id: str, token: str) -> requests.Response:
+    def delete_item(
+        self, session: requests.Session, resource_plural: str, obj_id: str, token: str
+    ) -> requests.Response:
         """Deletes an item.
 
         :param session: A requests.Session object which will be used for the duration of
@@ -194,10 +233,17 @@ class Gateway:
         :returns: A status message
         """
         url = self.__url(resource_plural, obj_id=obj_id)
-        return self.__request(session, 'DELETE', url, token)
+        return self.__request(session, "DELETE", url, token)
 
-
-    def __request(self, session: requests.Session, verb: str, url: str, token: str, params: dict = {}, payload: str = '') -> requests.Response:
+    def __request(
+        self,
+        session: requests.Session,
+        verb: str,
+        url: str,
+        token: str,
+        params: dict = {},
+        payload: str = "",
+    ) -> requests.Response:
         """Submits request through session using bearer token.
 
         :param session: A requests.Session object which will be used for the duration of
@@ -210,17 +256,17 @@ class Gateway:
 
         :returns: requests.Response object
         """
-        tokenstring = 'Bearer ' + token
-        headers = {
-            'Authorization': tokenstring
-            }
+        tokenstring = "Bearer " + token
+        headers = {"Authorization": tokenstring}
         # dict {'param1': 'value1', 'param2': None} becomes query string 'param1=value1&param2'
-        params = '&'.join([k if v is None else f"{k}={v}" for k, v in params.items()])
+        params = "&".join([k if v is None else f"{k}={v}" for k, v in params.items()])
 
         # Replace verify=False below with this instead to verify the certificate:
         #   verify='path/to/certificate'
         try:
-            res = session.request(verb, url, headers=headers, params=params, data=payload, verify=False)
+            res = session.request(
+                verb, url, headers=headers, params=params, data=payload, verify=False
+            )
             res.raise_for_status()
         except requests.exceptions.HTTPError as err:
             # you could catch 400 Bad Request etc. here
@@ -233,17 +279,18 @@ class Gateway:
             raise SystemExit(err)
         return res
 
-
-    def __url(self, resource_plural: str, obj_id: str = None, child_item_type: str = None):
+    def __url(
+        self, resource_plural: str, obj_id: str = None, child_item_type: str = None
+    ):
         """Formats request URI.
 
         :param resource_plural: The name of the resource type
         :param obj_id: Optional id of object
         :param child_item_type: Optional child item type
         """
-        result = f'{self._serverUrl}/api/rest/v1/{resource_plural}'
+        result = f"{self._serverUrl}/api/rest/v1/{resource_plural}"
         if obj_id is not None:
-            result += '/' + obj_id
+            result += "/" + obj_id
         if child_item_type is not None:
-            result += '/' + child_item_type
+            result += "/" + child_item_type
         return result

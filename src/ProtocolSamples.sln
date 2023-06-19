@@ -23,6 +23,8 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "RestfulCommunicationPython"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OauthLoginFlow", "..\OauthLoginFlow\OauthLoginFlow.csproj", "{971B6B56-7A61-45D2-8AC7-9B5E50AE0A64}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "EventsRestApiPython", "..\EventsRestApiPython\EventsRestApiPython.pyproj", "{3165A378-6953-4D33-9F9B-696252C0D97A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -67,6 +69,8 @@ Global
 		{971B6B56-7A61-45D2-8AC7-9B5E50AE0A64}.Debug|x64.Build.0 = Debug|x64
 		{971B6B56-7A61-45D2-8AC7-9B5E50AE0A64}.Release|x64.ActiveCfg = Release|x64
 		{971B6B56-7A61-45D2-8AC7-9B5E50AE0A64}.Release|x64.Build.0 = Release|x64
+		{3165A378-6953-4D33-9F9B-696252C0D97A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3165A378-6953-4D33-9F9B-696252C0D97A}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

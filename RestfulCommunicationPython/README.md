@@ -1,15 +1,15 @@
 ---
-description: This sample demonstrates how to access a RESTful API through the API Gateway from a Python-based application.
+description: This sample demonstrates how to access the RESTful Config API through the API Gateway from a Python-based application.
 keywords:
 - Protocol integration
-- RESTful communication
+- RESTful Config API
 - API Gateway
 - Identity Provider
 lang: en-US
 title: RESTful Communication - Python
 ---
 
-# RESTful Communication - Python
+# RESTful Config API - Python
 
 This sample shows how to use the RESTful API Gateway from a Python application. It demonstrates basic CRUD operations, asynchronously invoking a task, checking up on the task status, and duplicating a rule.
 
@@ -21,12 +21,12 @@ The sample logs into the server, creates, gets, updates, and deletes a user-defi
 
 - XProtect 2021 R2 or later.
 - The API Gateway installed on the same host as the management server.
-- A basic user with the Administrators role.
+- A user with the Administrators role.
 - A PTZ camera with PTZ Presets if you'd like to run the `cameras_and_tasks()` part of the sample.
-- Python version 3.6 or newer.
-- The Python package 'Requests'. To install 'Requests':
-  - In a command prompt, enter `pip install requests`.
-  - In Visual Studio Solution Explorer, select a Python environment under Python Environments, then from the context menu select Manage Python Packages and search for "requests".
+- Python version 3.7 or newer.
+- The Python packages 'requests' and 'requests-ntml'. To install the package:
+  - In a command prompt, enter `pip install <package-name>`.
+  - In Visual Studio Solution Explorer, select a Python environment under Python Environments, then from the context menu select Manage Python Packages and search for *\<package-name>*. TODO how to open Python Environments, widen window to see Packages tab
 
 ## The sample demonstrates
 
@@ -37,11 +37,13 @@ The sample logs into the server, creates, gets, updates, and deletes a user-defi
 
 ## Using
 
-- RESTful API
+- RESTful Config API
 
 ## Related samples
 
-- ComponentSamples/RestfulCommunication
+- mipsdk-samples-component/RestfulCommunication
+- mipsdk-samples-protocol/EventsRestApiPython
+
 
 ## Environment
 
@@ -49,4 +51,4 @@ The sample logs into the server, creates, gets, updates, and deletes a user-defi
 
 ## Visual Studio Python project
 
-- [RestfulCommunicationPython.pyproj](javascript:openLink('..\\\\ProtocolSamples\\\\RestfulCommunicationPython\\\\RestfulCommunicationPython.pyproj');)
+- [RestfulCommunicationPython.pyproj](javascript:clone('https://github.com/milestonesys/mipsdk-samples-protocol','src/ProtocolSamples.sln');)

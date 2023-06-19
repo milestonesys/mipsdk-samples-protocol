@@ -33,6 +33,8 @@ The sample then proceeds through all above steps, and writes information to the 
 
 ![OAuth login flow](OauthLoginFlow.png)
 
+For information about login, please refer to <a href="https://doc.developer.milestonesys.com/html/index.html?base=gettingstarted/gettingstarted/intro_environments_login.html&tree=tree_4.html" target="_blank">Introduction to MIP Environments and Login</a>
+
 ## Prerequisites
 
 You must have configured an external identity provider for the XProtect VMS.
@@ -53,4 +55,4 @@ You must have configured an external identity provider for the XProtect VMS.
 
 ## Visual Studio C\# project
 
-- [OAuthLoginFlow.csproj](javascript:openLink('..\\\\ProtocolSamples\\\\OAuthLoginFlow\\\\OAuthLoginFlow.csproj');)
+- [OAuthLoginFlow.csproj](javascript:clone('https://github.com/milestonesys/mipsdk-samples-protocol','src/ProtocolSamples.sln');)

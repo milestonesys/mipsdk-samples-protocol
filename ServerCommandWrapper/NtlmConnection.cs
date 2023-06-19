@@ -111,8 +111,8 @@ namespace ServerCommandWrapper.Ntlm
                 var url = $"{prefix}://{hostname}:{_port}/ManagementServer/ServerCommandService.svc";                
                 WSHttpBinding binding = new WSHttpBinding()
 	            {
-		            MaxReceivedMessageSize = 1000000
-	            };
+		            MaxReceivedMessageSize = Int32.MaxValue
+                };
 	            EndpointAddress remoteAddress = new EndpointAddress(url);
 
 	            Server = new ServerCommandServiceClient(binding, remoteAddress);
