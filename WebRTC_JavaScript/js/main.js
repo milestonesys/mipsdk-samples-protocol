@@ -1,57 +1,124 @@
 'use strict';
 
-const STUN_URL = "stun:stun1.l.google.com:19302";
+let peerConnection, sessionId;
+let apiGatewayUrl, webRtcUrl, cameraId, streamId, token, playbackTime, skipGaps, speed, stunUrl, turnUrl, turnUserName, turnCredential;
+let candidates = [];
+let iceServers = [];
+let refreshTimerId;
+let frameStartTime;
 
-var pc, sessionId;
-var apiGatewayUrl, webRtcUrl, cameraId, token;
-var candidates = [];
-var refreshTimerId;
-
-var startTime, endTime;
 // Timeout in milliseconds for polling API Gateway
 const pollingTimeout = 20;
-
+let videoObject;
 
 async function start() {
-    startTime = Date.now();
+    let startTime = Date.now();
+    frameStartTime = Date.now();
 
-    if (pc != null) await pc.close();
+    if (peerConnection != null) await closePeerConnection();
 
     apiGatewayUrl = document.getElementById("apiGatewayUrl").value;
     if (apiGatewayUrl.slice(-1) == '/')
         apiGatewayUrl = apiGatewayUrl.slice(0, -1);
     webRtcUrl = apiGatewayUrl + "/REST/v1/WebRTC";
     cameraId = document.getElementById("cameraId").value;
+    streamId = document.getElementById("streamId").value;
+    playbackTime = document.getElementById("playbackTime").value;
+    skipGaps = document.getElementById("skipGaps").checked;
+    speed = document.getElementById("speed").value;
+    stunUrl = document.getElementById("stunUrl").value;
+    turnUrl = document.getElementById("turnUrl").value;
+    turnUserName = document.getElementById("turnUserName").value;
+    turnCredential = document.getElementById("turnCredential").value;
 
+    if (stunUrl) {
+        iceServers.push({ urls: stunUrl });
+    }
+    if (turnUrl) {
+        iceServers.push({ urls: turnUrl, username: turnUserName, credential: turnCredential });
+    }
+    if (playbackTime) {
+        
+        frameStartTime = Date.parse(playbackTime);
+    }
     await login();
 
-    pc = new RTCPeerConnection({ iceServers: [{ urls: STUN_URL }] });
+    peerConnection = new RTCPeerConnection({ iceServers: iceServers });
 
-    pc.ontrack = evt => document.querySelector('#videoCtl').srcObject = evt.streams[0];
-    pc.onicecandidate = evt => evt.candidate && sendIceCandidate(JSON.stringify(evt.candidate));
+    peerConnection.ontrack = evt => document.querySelector('#videoCtl').srcObject = evt.streams[0];
+    peerConnection.onicecandidate = evt => evt.candidate && sendIceCandidate(JSON.stringify(evt.candidate));
+
+    videoObject = document.querySelector('#videoCtl');
+
+    if (navigator.userAgent.search("Firefox")) {
+        requestAnimationFrame(onAnimationFrameReceived);
+    } else {
+        videoObject.requestVideoFrameCallback?.(onFrameReceived);
+    }
 
     // Diagnostics
-    pc.onconnectionstatechange = () => {
-        log("Connection state", pc.connectionState);
-        if (pc.connectionState === "failed") {
-            closePeer();
+    peerConnection.onconnectionstatechange = () => {
+        log("Connection state", peerConnection.connectionState);
+        if (peerConnection.connectionState == "failed") {
+            closePeerConnection();
         }
 
-        if (pc.connectionState === "connected") {
-            endTime = Date.now();
+        if (peerConnection.connectionState == "connected") {
+            let endTime = Date.now();
             log(`Establishing connection time: ${endTime - startTime} ms`);
         }
     }
-    pc.oniceconnectionstatechange = () => log("ICE connection state", pc.iceConnectionState);
-    pc.onicegatheringstatechange = () => log("ICE gathering state", pc.iceGatheringState);
-    pc.onsignalingstatechange = () => log("Signaling state", pc.signalingState);
+    peerConnection.oniceconnectionstatechange = () => log("ICE connection state", peerConnection.iceConnectionState);
+    peerConnection.onicegatheringstatechange = () => log("ICE gathering state", peerConnection.iceGatheringState);
+    peerConnection.onsignalingstatechange = () => log("Signaling state", peerConnection.signalingState);
 		
     initiateWebRTCSession();
 }
 
-async function closePeer() {
-    await pc.close();
+
+const onAnimationFrameReceived = () => {
+    let receiver = peerConnection.getReceivers()[0];
+    if (receiver) {
+        let synchronizationData = receiver.getSynchronizationSources()[0];
+        if (synchronizationData) {
+            let frameDate = new Date(frameStartTime + synchronizationData.rtpTimestamp);
+            document.getElementById("frameTimeLabel").innerHTML = formatDate(frameDate);
+        }
+    }
+
+    requestAnimationFrame(onAnimationFrameReceived);
+}
+
+
+const onFrameReceived = (now, metadata) => {
+    let frameDate = new Date(frameStartTime + metadata.rtpTimestamp);
+    document.getElementById("frameTimeLabel").innerHTML = formatDate(frameDate);
+
+    // Re-register the callback to be notified about the next frame.
+    videoObject.requestVideoFrameCallback(onFrameReceived);
+};
+
+function formatDate(date) {
+    let month = prependZero(date.getUTCMonth() + 1);
+    let day = prependZero(date.getUTCDate());
+    let hours = prependZero(date.getUTCHours());
+    let minutes = prependZero(date.getUTCMinutes());
+    let seconds = prependZero(date.getUTCSeconds());
+
+    return month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
+}
+
+function prependZero(number) {
+    if (number < 10)
+        return "0" + number;
+    else
+        return number;
+}
+
+async function closePeerConnection() {
+    await peerConnection.close();
     document.querySelector('#videoCtl').srcObject = null;
+    candidates.length = 0; iceServers.length = 0;
     clearAnyRefreshTimers();
 };
 
@@ -64,8 +131,27 @@ function log() {
 
 async function initiateWebRTCSession() {
     try {
-        // Initiate WebRTC session on the server
-        const body = { cameraId: cameraId, resolution: "notInUse" };
+        let body = { cameraId: cameraId, resolution: "notInUse" };
+        if (streamId)
+            body.streamId = streamId;
+        if (playbackTime) {
+            let playbackTimeNode = { playbackTime: playbackTime };
+            if (speed)
+                playbackTimeNode.speed = speed;
+            if (skipGaps)
+                playbackTimeNode.skipGaps = skipGaps;
+            body.playbackTimeNode = playbackTimeNode;
+        }
+        // pass any configured STUN or TURN servers on to the VMS
+        body.iceServers = [];
+        if (stunUrl) {
+            body.iceServers.push({ url: stunUrl });
+        }
+        if (turnUrl) {
+            body.iceServers.push({ url: turnUrl, username: turnUserName, credential: turnCredential });
+        }
+
+        // Initiate WebRTC session on the server        
         await fetch(webRtcUrl + "/Session", {
             method: 'POST',
             headers: {
@@ -78,16 +164,17 @@ async function initiateWebRTCSession() {
         {
             await checkResponse(response);
 
-            var sessionData = await response.json();
+            let sessionData = await response.json();
             sessionId = sessionData["sessionId"];
 
             // Update answerSDP value on the server
-            await pc.setRemoteDescription(JSON.parse(sessionData["offerSDP"]));
-            console.log("remote sdp:\n" + pc.remoteDescription.sdp);
-            pc.createAnswer()
-                .then((answer) => pc.setLocalDescription(answer))
-                .then(() => console.log("local sdp:\n" + pc.localDescription.sdp))
-                .then(() => updateAnswerSDP(JSON.stringify(pc.localDescription)));
+            await peerConnection.setRemoteDescription(JSON.parse(sessionData["offerSDP"]));
+            console.log("remote sdp:\n" + peerConnection.remoteDescription.sdp);
+
+            peerConnection.createAnswer()
+                .then((answer) => peerConnection.setLocalDescription(answer))
+                .then(() => console.log("local sdp:\n" + peerConnection.localDescription.sdp))
+                .then(() => updateAnswerSDP(JSON.stringify(peerConnection.localDescription)));
 
             // Add server ICE candidates
             addServerIceCandidates();
@@ -95,7 +182,7 @@ async function initiateWebRTCSession() {
             console.log('InitiateWebRTCSession end');
             return;
         }).catch(function (error) {
-            var msg = "Failed to initiate WebRTC session - " + error;
+            let msg = "Failed to initiate WebRTC session - " + error;
             console.log(msg);
             log(msg);
         });
@@ -107,7 +194,7 @@ async function initiateWebRTCSession() {
 }
 
 async function updateAnswerSDP(localDescription) {
-    var patchAnswerSDPData = {
+    let patchAnswerSDPData = {
         'answerSDP': localDescription
     };
 
@@ -129,7 +216,7 @@ async function updateAnswerSDP(localDescription) {
         console.log('Updated WebRTC session object: ' + json);
         return json;
     }).catch(function(error){
-        var msg = "Failed to update session with answerSDP - " + error;
+        let msg = "Failed to update session with answerSDP - " + error;
         console.log(msg);
         log(msg);
     });
@@ -137,8 +224,8 @@ async function updateAnswerSDP(localDescription) {
 
 // Polling API Gateway to get remote ICE candidates
 async function addServerIceCandidates() {
-    if (pc.iceConnectionState == "new" ||
-        pc.iceConnectionState == "checking") {
+    if (peerConnection.iceConnectionState == "new" ||
+        peerConnection.iceConnectionState == "checking") {
 
         await fetch(webRtcUrl + "/IceCandidates/" + sessionId, {
             method: 'GET',
@@ -153,16 +240,18 @@ async function addServerIceCandidates() {
                 if (!candidates.includes(element)) {
                     console.log("ICE candidate data: " + element);
                     candidates.push(element);
-                    var obj = JSON.parse(element);
-                    await pc.addIceCandidate(obj);
+                    let obj = JSON.parse(element);
+                    await peerConnection.addIceCandidate(obj);
                 }
             }
 
         }).catch(function (error) {
-            var msg = "Failed to retrieve ICE candidate from server - " + error;
+            let msg = "Failed to retrieve ICE candidate from server - " + error;
             console.log(msg);
             log(msg);
         });
+
+        setTimeout(addServerIceCandidates, pollingTimeout);
     }
 }
 
@@ -182,7 +271,7 @@ async function sendIceCandidate(candidate) {
 
         console.log('Client candidates sent successfully');
     }).catch (function (error) {
-        var msg = "Failed to send ICE candidate - " + error;
+        let msg = "Failed to send ICE candidate - " + error;
         console.log(msg);
         log(msg);
     });
@@ -190,14 +279,14 @@ async function sendIceCandidate(candidate) {
 
 async function checkResponse(response) {
     if (!response.ok) {
-        var errorInfo = await response.json();
+        let errorInfo = await response.json();
         throw Error(errorInfo);
     }
     return true;
 }
 
 async function login() {
-    if(pc != null) await pc.close();
+    if(peerConnection != null) await peerConnection.close();
 
     try {
         token = await getToken();

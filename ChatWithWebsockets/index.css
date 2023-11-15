@@ -1,0 +1,140 @@
+﻿/* baseline */
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+}
+
+
+input,
+button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+input {
+    border: 1px solid #555;
+    background-color: white;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    font: 1rem / 1.5 sans-serif;
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+}
+
+/* colors */
+:root {
+    --blue: #0099da;
+    --darker-blue: #035d88;
+    --red: #D21f3c;
+    --darker-red: #b51933;
+}
+
+/* styles */
+#messageInput {
+    min-width: 50vw;
+    margin: 20px;
+    margin-top: 80px;
+    margin-bottom: 40px;
+}
+
+.messages {
+    min-width: 70vw;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: start;
+    justify-content: start;
+    gap: 10px;
+    margin-bottom: 80px;
+}
+
+.message {
+    padding: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100%;
+}
+
+    .message.received {
+        background: white;
+        color: #555;
+        text-align: start;
+    }
+
+    .message.sent {
+        background: var(--blue);
+        color: white;
+        text-align: end;
+    }
+
+.login {
+    display: flex;
+    flex-direction: column;
+    display-direction: row;
+    gap: 10px;
+}
+
+    .login > input {
+        font: 0.8rem / 0.5 sans-serif;
+    }
+
+    .login > #connect {
+        background: var(--blue);
+        color: white;
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .login > #connect:hover {
+        background: var(--darker-blue);
+    }
+
+    .login > #connect.error {
+        background: var(--red);
+    }
+
+    .login > #connect.error:hover {
+        background: var(--darker-red);
+    }
+
+.centered {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+#chatPage {
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    flex: 1;
+}
+
+#loginPage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+

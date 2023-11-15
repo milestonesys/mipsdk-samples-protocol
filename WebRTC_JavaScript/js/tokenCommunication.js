@@ -10,7 +10,7 @@ async function refreshToken() {
         'token': token
     };
 
-    await fetch(webRtcUrl + "/WebRTCSession/" + sessionId, {
+    await fetch(webRtcUrl + "/Session/" + sessionId, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',

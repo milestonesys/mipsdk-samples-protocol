@@ -1,0 +1,6 @@
+aiohttp
+keyboard
+requests
+requests-ntlm
+urllib3
+websockets

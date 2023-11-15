@@ -10,6 +10,7 @@
 </head>
   <body>
       <h1>Live video streaming with WebRTC</h1>
+      <label>Date and time: </label><label id="frameTimeLabel"></label>
       <div>
           <video id="videoCtl" controls="controls" autoplay="autoplay"></video>
           <div id="diagnostics">
@@ -17,30 +18,56 @@
           </div>
       </div>
       <div>
-          <div>
-              <div class="input">
-                  <label for="apiGatewayUrl">API Gateway URL:</label>
-                  <input type="url" id="apiGatewayUrl" name="apiGatewayUrl" size="42" placeholder="https://apigatewayserver.example.com/api"/>
-              </div>
-              <div class="input">
-                  <label for="cameraId">CameraId:</label>
-                  <input type="text" id="cameraId" name="cameraId" size="42" pattern="^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$" placeholder="A364956F-39A5-4CBC-9FFE-55B0C802CA77" />
-              </div>
-              <br>
-              <div class="input">
-                  <label for="username">Username:</label>
-                  <input type="text" id="username" name="username" placeholder="username" />
-              </div>
-              <div class="input">
-                  <label for="password">Password:</label>
-                  <input type="password" id="password" name="password" placeholder="password" />
-              </div>
+          <div class="input">
+              <label for="apiGatewayUrl">API Gateway URL:</label>
+              <input type="url" id="apiGatewayUrl" name="apiGatewayUrl" size="42" placeholder="https://apigatewayserver.example.com/api" />
+          </div>
+          <div class="input">
+              <label for="cameraId">CameraId:</label>
+              <input type="text" id="cameraId" name="cameraId" size="42" pattern="^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$" placeholder="A364956F-39A5-4CBC-9FFE-55B0C802CA77" />
+          </div>
+          <div class="input">
+              <label for="streamId">StreamId (optional):</label>
+              <input type="text" id="streamId" name="streamId" size="42" pattern="^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$" placeholder="5E9BA1DC-D012-425B-AB5A-611A5FB6DAE5" />
+          </div>
+          <div class="input">
+              <label for="playbackTime">Playback Time (optional):</label>
+              <input type="datetime" id="playbackTime" name="playbackTime" size="42" pattern="^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?Z$" placeholder="2023-01-01T01:01:01.000Z" />
+          </div>
+          <div class="input">
+            <label for="skipGaps">Skip Gaps (optional):</label>
+            <input type="checkbox" id="skipGaps" name="skipGaps"/>
+        </div>
+        <div class="input">
+            <label for="speed">Playback Speed (optional):</label>
+            <input type="text" id="speed" name="speed" pattern="\d{1,2}([.]\d+)?" placeholder="1.0" />
+        </div>
+          <br>
+          <div class="input">
+              <label for="username">Username:</label>
+              <input type="text" id="username" name="username" placeholder="username" />
+          </div>
+          <div class="input">
+              <label for="password">Password:</label>
+              <input type="password" id="password" name="password" placeholder="password" />
+          </div>
+          <div class="input">
+              <label for="stunUrl">STUN URL (optional):</label>
+              <input type="url" id="stunUrl" name="stunUrl" size="42" placeholder="stun:stun1.l.google.com:19302" />
+          </div>
+          <div class="input">
+              <label for="turnUrl">TURN URL (optional):</label>
+              <input type="url" id="turnUrl" name="turnUrl" size="42" placeholder="turn:myturn.turnprovider.abc:34567" />
+              <label for="turnUrl">Username:</label>
+              <input type="text" id="turnUserName" name="turnUserName" size="42" placeholder="myTurnUser" />
+              <label for="turnUrl">Credential:</label>
+              <input type="password" id="turnCredential" name="turnCredential" size="42" placeholder="credential" />
           </div>
       </div>
       <br><br>
       <div class="buttons">
           <button onclick="start()">Start</button>
-          <button onclick="closePeer()">Close</button>
+          <button onclick="closePeerConnection()">Close</button>
       </div>
   </body>
 </html>

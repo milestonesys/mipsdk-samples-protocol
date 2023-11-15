@@ -33,11 +33,11 @@ The sample then proceeds through all above steps, and writes information to the 
 
 ![OAuth login flow](OauthLoginFlow.png)
 
-For information about login, please refer to <a href="https://doc.developer.milestonesys.com/html/index.html?base=gettingstarted/gettingstarted/intro_environments_login.html&tree=tree_4.html" target="_blank">Introduction to MIP Environments and Login</a>
+For information about login, please refer to <a href="https://doc.developer.milestonesys.com/html/index.html?base=gettingstarted/intro_environments_login.html&tree=tree_4.html" target="_top">Introduction to MIP Environments and Login</a>
 
 ## Prerequisites
 
-You must have configured an external identity provider for the XProtect VMS.
+You must have configured an external identity provider for the XProtect VMS. For information about settings up external indentity provider, please refer to [Configure External IDP](https://doc.milestonesys.com/latest/en-US/standard_features/sf_mc/sf_mcnodes/sf_6security/mc_addandconfigureexternalidp.htm)
 
 ## The sample demonstrates
 

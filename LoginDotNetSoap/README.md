@@ -25,7 +25,7 @@ camera, as well as the recording server port.
 The readable part of the protocol communication is displayed in the
 console window.
 
-For information about login, please refer to <a href="https://doc.developer.milestonesys.com/html/index.html?base=gettingstarted/gettingstarted/intro_environments_login.html&tree=tree_4.html"  target="_blank">Introduction to MIP Environments and Login</a>
+For information about login, please refer to <a href="https://doc.developer.milestonesys.com/html/index.html?base=gettingstarted/intro_environments_login.html&tree=tree_4.html"  target="_top">Introduction to MIP Environments and Login</a>
 
 ## The sample demonstrates
 
