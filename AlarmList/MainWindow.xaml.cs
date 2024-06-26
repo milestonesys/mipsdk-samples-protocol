@@ -152,6 +152,9 @@ namespace AlarmList
 
         private void SetAuthentication()
         {
+#pragma warning disable CS0162 // Unreachable code detected
+#pragma warning disable S2583  // Conditionally executed code should be reachable
+#pragma warning disable S2589  // Boolean expressions should not be gratuitous
             switch (CurrentSetup)
             {
                 case Setup.BasicUser:
@@ -171,6 +174,9 @@ namespace AlarmList
                     _domainName = CredentialCache.DefaultNetworkCredentials.Domain;
                     break;
             }
+#pragma warning restore S2589  // Boolean expressions should not be gratuitous
+#pragma warning restore S2583  // Conditionally executed code should be reachable
+#pragma warning restore CS0162 // Unreachable code detected
         }
         private void Login()
         {

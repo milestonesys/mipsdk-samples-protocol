@@ -15,10 +15,6 @@ title: WebRTC - JavaScript client
 
 This sample uses a RESTful API for the signaling required to establish a WebRTC connection with an XProtect VMS through the API Gateway.
 
-> **Playback support in BETA**  
-> Support has been added for specifying playback time, speed, and whether gaps should be skipped when creating a WebRTC session.  
-> To be considered beta for this release.
-
 ## Prerequisites
 
 - XProtect 2023 R1 or later (stream, playback and TURN server configuration requires 2023 R3).
@@ -162,7 +158,7 @@ The bearer token expires (default after 1 hour). Code for getting and refreshing
 
 For more information about the signaling involved in establishing a WebRTC connection, please refer to: [WebRTC API, Signaling and video calling][mdn-webrtc-sign]
 
-### Playback of recorded video [BETA]
+### Playback of recorded video
 
 If a playback start time is provided, recorded video is streamed instead of live video. The API Gateway will start streaming at the requested time. If there's no video recorded at that time and skip gaps is enabled, the stream will immediately forward to the first video sequence after the requested time.
 
@@ -372,6 +368,28 @@ Open and edit `appsettings.production.json` in a validating editor. For more inf
 #### Remedy
 
 Try temporarily enabling 32-Bit Applications in the IIS application pool `VideoOS ApiGateway AppPool`. If WebRTC is the cause of the crash, enabling 32-Bit Applications may provide you with more detailed error information.
+
+### No video shown
+
+#### Symptoms
+
+- A connection is established, but no video is shown.
+
+#### Cause
+
+The video stream is not H.264. The API Gateway supports only H.264.
+
+#### Remedy
+
+Change the camera's codec to H.264 or use a camera that supports H.264.
+
+#### Cause
+
+The requested playback time is more than 24 days before the start of the recorded video. This causes an integer wraparound in the WebRTC code.
+
+#### Remedy
+
+Use a playback time closer than 24 days to the start of recorded video.
 
 ## The sample demonstrates
 

@@ -34,7 +34,7 @@ namespace OauthLoginFlow
         private const string AuthorizationUrlKey = "authorization_endpoint";
         private const string ConnectUrlKey = "token_endpoint";
         private const string ExternalProvidersUrlKey = "external_providers_uri";
-        private static string ClientIdString = "VmsClient";       // Administrators should use: VmsAdminClient
+        private static string ClientIdString = "VmsAdminClient";       // Administrators should use: VmsAdminClient
         private static string Scope = "openid profile managementserver offline_access";
         private const string IdpSignInUrlPath = "/idp/connect/authorize?response_type=code&nonce={0}&state={1}&code_challenge={2}" +
                                 "&code_challenge_method=S256&client_id={3}&scope={4}&redirect_uri={5}&acr_values=idp%3A{6}&culture={7}&prompt=login";

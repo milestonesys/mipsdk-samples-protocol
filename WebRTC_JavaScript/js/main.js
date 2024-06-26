@@ -119,6 +119,7 @@ async function closePeerConnection() {
     await peerConnection.close();
     document.querySelector('#videoCtl').srcObject = null;
     candidates.length = 0; iceServers.length = 0;
+    document.getElementById("frameTimeLabel").innerHTML = "";
     clearAnyRefreshTimers();
 };
 
@@ -138,8 +139,7 @@ async function initiateWebRTCSession() {
             let playbackTimeNode = { playbackTime: playbackTime };
             if (speed)
                 playbackTimeNode.speed = speed;
-            if (skipGaps)
-                playbackTimeNode.skipGaps = skipGaps;
+            playbackTimeNode.skipGaps = skipGaps;
             body.playbackTimeNode = playbackTimeNode;
         }
         // pass any configured STUN or TURN servers on to the VMS

@@ -70,7 +70,9 @@ namespace ServerCommandWrapper.Basic
             _password = password;
             _port = port;
 
-			_isOAuthServer = Task.Run(() => IdpClientProxy.IsOAuthServer(_hostName, OAuthServerPrefix, port)).GetAwaiter().GetResult();
+            var prefix = OAuthServerPrefix;
+
+            _isOAuthServer = Task.Run(() => IdpClientProxy.IsOAuthServer(_hostName, prefix, port)).GetAwaiter().GetResult();
             if (_isOAuthServer)
             {
 	            // If the OAuth server is available it uses OAuth version of ServerCommandService.

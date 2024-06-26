@@ -1,13 +1,22 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlarmList", "..\AlarmList\AlarmList.csproj", "{57B84090-BF8B-426A-B12C-DD7D78770120}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B07F6D9D-D21C-4BBB-8281-92EC92E67484} = {B07F6D9D-D21C-4BBB-8281-92EC92E67484}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoginDotNetSoap", "..\LoginDotNetSoap\LoginDotNetSoap.csproj", "{70E6E0C7-76EC-41DF-B446-A787D071A7A0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B07F6D9D-D21C-4BBB-8281-92EC92E67484} = {B07F6D9D-D21C-4BBB-8281-92EC92E67484}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpVideoViewer", "..\TcpVideoViewer\TcpVideoViewer.csproj", "{413667E6-4212-4238-BF54-D5ED669F32D4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B07F6D9D-D21C-4BBB-8281-92EC92E67484} = {B07F6D9D-D21C-4BBB-8281-92EC92E67484}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TriggerGenericEvent", "..\TriggerGenericEvent\TriggerGenericEvent.csproj", "{5FFC3210-A0D7-4567-9667-505B40048D7C}"
 EndProject
@@ -18,6 +27,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerCommandWrapper", "..\ServerCommandWrapper\ServerCommandWrapper.csproj", "{B07F6D9D-D21C-4BBB-8281-92EC92E67484}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookmarkCreator", "..\BookmarkCreator\BookmarkCreator.csproj", "{78A2F3CA-7D2C-47C5-980C-4C529C6061F0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B07F6D9D-D21C-4BBB-8281-92EC92E67484} = {B07F6D9D-D21C-4BBB-8281-92EC92E67484}
+	EndProjectSection
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "RestfulCommunicationPython", "..\RestfulCommunicationPython\RestfulCommunicationPython.pyproj", "{2BA5770A-5133-4454-8450-CC66BDD513E6}"
 EndProject
@@ -91,8 +103,8 @@ Global
 		{B07F6D9D-D21C-4BBB-8281-92EC92E67484}.Debug|x64.Build.0 = Debug|Any CPU
 		{B07F6D9D-D21C-4BBB-8281-92EC92E67484}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B07F6D9D-D21C-4BBB-8281-92EC92E67484}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B07F6D9D-D21C-4BBB-8281-92EC92E67484}.Release|x64.ActiveCfg = Release|Any CPU
-		{B07F6D9D-D21C-4BBB-8281-92EC92E67484}.Release|x64.Build.0 = Release|Any CPU
+		{B07F6D9D-D21C-4BBB-8281-92EC92E67484}.Release|x64.ActiveCfg = Release|x64
+		{B07F6D9D-D21C-4BBB-8281-92EC92E67484}.Release|x64.Build.0 = Release|x64
 		{78A2F3CA-7D2C-47C5-980C-4C529C6061F0}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{78A2F3CA-7D2C-47C5-980C-4C529C6061F0}.Debug|Any CPU.Build.0 = Debug|x64
 		{78A2F3CA-7D2C-47C5-980C-4C529C6061F0}.Debug|x64.ActiveCfg = Debug|x64

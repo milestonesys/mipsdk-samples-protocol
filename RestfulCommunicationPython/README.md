@@ -26,9 +26,11 @@ The sample logs into the server, creates, gets, updates, and deletes a user-defi
 - Python version 3.7 or newer.
 - The Python packages 'requests' and 'requests-ntlm'. To install the package:
   - In a command prompt, enter `pip install <package-name>`.
-  - In Visual Studio Solution Explorer, select a Python environment under Python Environments, then from the context menu select Manage Python Packages and search for *\<package-name>*. TODO how to open Python Environments, widen window to see Packages tab
+  - In Visual Studio Solution Explorer, select a Python environment under Python Environments, then from the context menu select Manage Python Packages and search for *\<package-name>*. 
+ <!-- TODO (PRI): how to open Python Environments, widen window to see Packages tab -->
   
 The sample is verified with the following versions of Python packages:
+
 - requests: 2.26.0
 - requests-ntlm: 1.2.0
 - urllib3: 1.26.16
