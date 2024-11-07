@@ -323,6 +323,28 @@ Errors are sometime presented in the browser as CORS error without being actual 
 
 Open your browser Developer tools and select the Network tab. If it is not an CORS error, the actual error will be shown here in the messages received before the CORS error.
 
+#### Cause
+
+CORS error can occur if using Firefox and self-signed certificates.
+
+#### Remedy
+
+Firefox does not use the Windows Certificate Store, so importing the certificate into Trusted Root Certification Authorities will not work in Firefox.
+Add the API Gateway server to the certificate administration -> servers in Firefox under security. If your IDP server is hosted at another url, make sure to add this as well.
+See following examples:
+
+API Gateway url: myurl.domain/api
+
+IDP url: myurl.domain/IDP
+
+In this example myurl.domain needs to be added to the excemptions.
+
+API Gateway url: myurl.domain/api
+
+IDP url: mysecondurl.domain/IDP
+
+In this example both myurl.domain and mysecondurl.domain need to be added to the excemptions.
+
 ### No connection through a symmetric NAT firewall
 
 #### Symptoms

@@ -6,6 +6,9 @@ let candidates = [];
 let iceServers = [];
 let refreshTimerId;
 let frameStartTime;
+let reconnect = false;
+let isPlayback = false;
+let frameDate;
 
 // Timeout in milliseconds for polling API Gateway
 const pollingTimeout = 20;
@@ -60,9 +63,9 @@ async function start() {
     peerConnection.onconnectionstatechange = () => {
         log("Connection state", peerConnection.connectionState);
         if (peerConnection.connectionState == "failed") {
-            closePeerConnection();
+            reconnect = true;
+            tryReConnect(0);
         }
-
         if (peerConnection.connectionState == "connected") {
             let endTime = Date.now();
             log(`Establishing connection time: ${endTime - startTime} ms`);
@@ -81,7 +84,7 @@ const onAnimationFrameReceived = () => {
     if (receiver) {
         let synchronizationData = receiver.getSynchronizationSources()[0];
         if (synchronizationData) {
-            let frameDate = new Date(frameStartTime + synchronizationData.rtpTimestamp);
+            frameDate = new Date(frameStartTime + synchronizationData.rtpTimestamp);
             document.getElementById("frameTimeLabel").innerHTML = formatDate(frameDate);
         }
     }
@@ -91,7 +94,7 @@ const onAnimationFrameReceived = () => {
 
 
 const onFrameReceived = (now, metadata) => {
-    let frameDate = new Date(frameStartTime + metadata.rtpTimestamp);
+    frameDate = new Date(frameStartTime + metadata.rtpTimestamp);
     document.getElementById("frameTimeLabel").innerHTML = formatDate(frameDate);
 
     // Re-register the callback to be notified about the next frame.
@@ -135,9 +138,16 @@ async function initiateWebRTCSession() {
         let body = { cameraId: cameraId, resolution: "notInUse" };
         if (streamId)
             body.streamId = streamId;
-        if (playbackTime) {
+        if (playbackTime && !reconnect || !frameDate) {
             let playbackTimeNode = { playbackTime: playbackTime };
             if (speed)
+                playbackTimeNode.speed = speed;
+            playbackTimeNode.skipGaps = skipGaps;
+            body.playbackTimeNode = playbackTimeNode;
+        }
+        else if(playbackTime && reconnect) {
+            let playbackTimeNode = { playbackTime: frameDate };
+            if(speed)
                 playbackTimeNode.speed = speed;
             playbackTimeNode.skipGaps = skipGaps;
             body.playbackTimeNode = playbackTimeNode;
@@ -298,3 +308,19 @@ async function login() {
 }
 
 
+async function tryReConnect(counter) {
+    try{
+    setTimeout(() => {
+        initiateWebRTCSession();
+    }, 10000);
+    }
+    catch(error) {
+        if(counter > 4) {
+             tryReConnect(counter + 1);
+        }
+        else {
+            closePeerConnection();
+        }
+    }
+    reconnect = false;
+}
