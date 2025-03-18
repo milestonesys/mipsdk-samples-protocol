@@ -51,6 +51,11 @@ def main():
         return
 
     user_defined_events = response.json()["array"]
+    
+    #Default ids present in the management client that should be ignored
+    default_ids = ['85867627-b287-4439-9e55-a63701e1715b', '77b1e70d-ba8d-4bb8-9ee8-43b09746d82a', '7605f8b0-7f5f-4432-b223-0bb2dc3f1f5c']
+    user_defined_events = [ids for ids in user_defined_events if ids['id'] not in default_ids]
+ 
     print(f"Retrieved {len(user_defined_events)} user defined event types")
 
     if len(user_defined_events) == 0:

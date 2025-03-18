@@ -6,17 +6,45 @@
     <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
     <script src="js/main.js"></script>
     <script src="js/tokenCommunication.js"></script>
+    <script src="js/websocket.js"></script>
+    <script src="js/rest.js"></script>
     <link rel="stylesheet" href="css/main.css">
 </head>
   <body>
       <h1>Live video streaming with WebRTC</h1>
       <label>Date and time: </label><label id="frameTimeLabel"></label>
-      <div>
-          <video id="videoCtl" controls="controls" autoplay="autoplay"></video>
-          <div id="diagnostics">
-              <h4>Diagnostics log</h4>
-          </div>
-      </div>
+        <div>
+            <video id="videoCtl" controls="controls" autoplay="autoplay"></video>
+            <div id="rightColumn">
+                <div>
+                    <h4>Diagnostics log</h4>
+                    <span id="diagnostics" />
+                </div>
+                <div>
+                    <h4>PTZ commands</h4>
+                    <span id="ptz">
+
+                        <button onclick="command('upLeft')">&#8598;</button>
+                        <button onclick="command('up')">&#8593;</button>
+                        <button onclick="command('upRight')">&#8599;</button>
+                        <br />
+                        <button onclick="command('left')">&#8592;</button>
+                        <button onclick="command('home')">&#8962;</button>
+                        <button onclick="command('right')">&#8594;</button>
+                        <br />
+                        <button onclick="command('downLeft')">&#8601;</button>
+                        <button onclick="command('down')">&#8595;</button>
+                        <button onclick="command('downRight')">&#8600;</button>
+                        <br />
+                        <br />
+                        <button id="auxButton" onclick="aux('1')">Aux 1</button>
+                        <button id="auxButton" onclick="aux('2')">Aux 2</button>
+                        <button id="auxButton" onclick="aux('3')">Aux 3</button>
+                        <button id="auxButton" onclick="aux('4')">Aux 4</button>
+                    </span>
+                </div>
+            </div>                                        
+        </div>
       <div>
           <div class="input">
               <label for="apiGatewayUrl">API Gateway URL:</label>
@@ -66,8 +94,24 @@
       </div>
       <br><br>
       <div class="buttons">
-          <button onclick="start()">Start</button>
-          <button onclick="closePeerConnection()">Close</button>
+        <div>
+            <button class="bar-item" onclick="tabSwitch(this, 'rest')" id="selected">REST</button>
+            <button class="bar-item" onclick="tabSwitch(this, 'websocket')">WebSocket</button>
+        </div>
+        <div id="rest" class="tabs">
+            <b>REST</b>
+            <br/>
+            <br/>
+            <button onclick="start()">Start</button>
+            <button onclick="closePeerConnection()">Close</button>
+        </div>
+        <div id="websocket" class="tabs" style="display:none;">
+            <b>WebSocket</b>
+            <br/>
+            <br/>
+            <button onclick="startWebsocket()">Start</button>
+            <button onclick="closePeerConnection()">Close</button>
+        </div>
       </div>
   </body>
 </html>

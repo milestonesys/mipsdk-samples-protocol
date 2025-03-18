@@ -15,6 +15,8 @@ div.input {
 
 div.buttons {
     margin-left: 140px;
+    width: 200px;
+    border: 1px solid;
 }
 
 label {
@@ -31,12 +33,45 @@ input:invalid {
     border: 1px solid red;
 }
 
-#diagnostics {
+#rightColumn {
     border: 1px solid #D3D3D3;
     width: 300px;
     height: 480px;
     display: inline-block;
-    vertical-align: top;
+    vertical-align: top;  
+}
+
+#diagnostics {
+    display: block;
+    height: 200px;
     resize: both;
     overflow: auto;
+}
+.bar-item {
+    width: 50%;
+    margin:0;
+    float:left;
+    border:none;
+    background-color: lightgrey;
+    color: black;
+}
+.bar-item#selected {
+    background-color: darkgrey;
+    color: black;
+}
+.bar-item:hover {
+    filter: brightness(80%);
+}
+.tabs {
+    padding: 10px;
+}
+}
+
+span#ptz button {
+    height: 30px;
+    width: 40px;
+}
+
+#auxButton {
+    width: auto !important;
 }

@@ -11,7 +11,7 @@ lang: en-US
 title: Chat with WebSockets Messages API - JavaScript
 --- 
 
-# Chat with WebSockets Messages API - JavaScript [BETA]
+# Chat with WebSockets Messages API - JavaScript
 
 This sample shows how to publish and subscribe to messages from a JavaScript browser application.
 
@@ -26,15 +26,13 @@ This sample is not production ready and has been kept simple in purpose. Learn a
 
 To learn more about the WebSockets Messages API, [read the full docs](/mipvmsapi/api/messages-ws/v1/).
 
-The WebSockets Messages API is in beta version. I.e., both the API and this sample might change without preserving backwards compatibility as long as it is in beta.
-
 ## Prerequisites
 
 - XProtect 2023 R2 or later.
 - The API Gateway installed on the same host as the management server.
 - The API Gateway configured to [allow CORS](/mipvmsapi/content/cors/).
 - A basic user.
- 
+
 ## The sample demonstrates
 
 - How to login using OpenID Connect/OAuth2 from a JavaScript application

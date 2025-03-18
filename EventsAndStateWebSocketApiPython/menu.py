@@ -3,8 +3,6 @@ Displays a menu and performs login when required
 """
 
 import os
-import ctypes
-from tkinter.tix import DisplayStyle
 import requests
 import urllib3
 import identity_provider
@@ -36,8 +34,10 @@ if not verify_ssl:
 
     
 def print_options():
-    ctypes.windll.kernel32.SetConsoleTitleW(f"Events and state API sample")
-    os.system("clear")
+    if os.name == "nt":
+        os.system("cls")
+    else:
+        os.system("clear")
     print(art)
     print(menu)
 

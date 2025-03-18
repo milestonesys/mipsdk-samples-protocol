@@ -10,13 +10,11 @@ lang: en-US
 title: Events REST API - Python
 ---
 
-# RESTful Events API - Python [BETA]
+# RESTful Events API - Python
 
 This sample shows how to trigger and retrieve events from a Python application.
 
 The sample logs into the server, retrieves any existing user-defined event, triggers it, retrieves the event by id and retrieves all stored events with their metadata.
-
-The RESTful Events API is in beta version. I.e., both the API and this sample might change without preserving backwards compatibility as long as it is in beta.
 
 ## Prerequisites
 

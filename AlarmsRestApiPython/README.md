@@ -10,13 +10,11 @@ lang: en-US
 title: Alarms REST API - Python
 ---
 
-# RESTful Alarms API - Python [BETA]
+# RESTful Alarms API - Python
 
 This sample shows how to trigger and retrieve alarms from a Python application.
 
 The sample gets an OAuth token, triggers an alarm, retrieves the alarm by id and retrieves all stored alarms with their metadata.
-
-The RESTful Alarms API is in beta version. I.e., both the API and this sample might change without preserving backwards compatibility as long as it is in beta.
 
 ## Prerequisites
 

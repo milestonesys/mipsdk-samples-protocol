@@ -16,7 +16,10 @@ def update_state_cache(source, state_group, event_type):
 
 
 def display_header():
-    os.system("clear")
+    if os.name == "nt":
+        os.system("cls")
+    else:
+        os.system("clear")
     print("Press ESC to return to menu")
     print("=" * 100)
     print("Source".ljust(50), "State group".ljust(30), "State".ljust(30))

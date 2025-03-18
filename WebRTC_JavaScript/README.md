@@ -1,23 +1,29 @@
 ---
-description: This sample uses a RESTful API for the signaling required to establish a WebRTC connection to an XProtect VMS through the API Gateway.
+description: This sample uses either a RESTful API or a WebSocket API for the signaling required to establish a WebRTC connection to an XProtect VMS through the API Gateway.
 keywords:
 - Protocol integration
 - RESTful communication
+- WebSocket communication
 - API Gateway
 - WebRTC
 - ICE candidates
 lang: en-US
 title: WebRTC - JavaScript client
 ---
-<!-- markdownlint-disable MD024 MD033 -->
+<!-- markdownlint-disable MD024 MD025 MD033 -->
 
 # WebRTC - JavaScript client
 
-This sample uses a RESTful API for the signaling required to establish a WebRTC connection with an XProtect VMS through the API Gateway.
+This sample uses either a RESTful API or a WebSocket API for the signaling required to establish a WebRTC connection with an XProtect VMS through the API Gateway.
+
+For more information, see <a href="https://doc.developer.milestonesys.com/html/index.html?base=gettingstarted/intro_WebRTC.html&tree=tree_4.html" target="_top">Introduction to WebRTC support in XProtect</a>.
 
 ## Prerequisites
 
-- XProtect 2023 R1 or later (stream, playback and TURN server configuration requires 2023 R3).
+- For RESTful:
+  - XProtect 2023 R1 or later (stream, playback and TURN server configuration requires 2023 R3).
+- For WebSocket
+  - XProtect 2025 R1 or later.
 - Camera with H.264 protocol.
 - An XProtect basic user, created locally, with access to the camera.
 - Chrome, Edge, Firefox, or Safari web browser.
@@ -33,7 +39,7 @@ This sample uses a RESTful API for the signaling required to establish a WebRTC 
   - A TURN server is required if there's a *symmetric NAT* between browser and the API Gateway. TURN servers usually also function as STUN servers.
   - A STUN server is required if there's a *non-symmetric (Full Cone) NAT* between browser and the API Gateway.
 
-## Set up WebRTC sample
+## Setting up the WebRTC sample
 
 You can open the sample webpage `index.html` in a browser directly from the sample directory, or host the sample directory `WebRTC_JavaScript` on a web server.
 
@@ -97,7 +103,7 @@ For more information about CORS, please refer to [Cross-Origin Resource Sharing 
 
 ![WebRTC - JavaScript client](WebRTC-JavaScriptClient.png)
 
-1. Open index.html in a browser
+1. Open `index.html` in a browser
 2. Enter the URL of the API Gateway.  
    Usually, the API Gateway is installed on the same host as the management server, that is, the API Gateway will be something like `https://managementServer.example.com/api`.
 3. Enter the **CameraId** of a camera that supports H.264.  
@@ -140,7 +146,16 @@ You can use the Management Client to get a `StreamId`:
 
 ## Description
 
-Please look at the `main.js` code while reading the following steps:
+Following is the description of the two different ways of setup of the WebRTC connection.
+
+### Common
+
+Both the RESTful and the WebSocket communication share several common setup and methods which are located in the `main.js`.
+Particularly the callback methods for the peer connection, commands, login in and log out.
+
+### RESTful API
+
+Please look at the `rest.js` code while reading the following steps:
 
 1. In `initiateWebRTCSession()`, the session is initiated by a POST request to `API/REST/v1/WebRTC/Session`.  
    The request body contains
@@ -158,7 +173,7 @@ The bearer token expires (default after 1 hour). Code for getting and refreshing
 
 For more information about the signaling involved in establishing a WebRTC connection, please refer to: [WebRTC API, Signaling and video calling][mdn-webrtc-sign]
 
-### Playback of recorded video
+#### Playback of recorded video
 
 If a playback start time is provided, recorded video is streamed instead of live video. The API Gateway will start streaming at the requested time. If there's no video recorded at that time and skip gaps is enabled, the stream will immediately forward to the first video sequence after the requested time.
 
@@ -200,9 +215,33 @@ Playback is controlled by including an optional `PlaybackTimeNode` object when i
 ```
 -->
 
-#### How to calculate time for current frame
+### WebSocket API
 
-1. In `start()` in `main()`,
+Please look at `websocket.js` code while reading the following:
+
+1. In the `startWebSocket()`, a new websocket is opened and a `register` request is sent to the API Gateway.
+2. Once the server responds the callback will send a `connect` request.
+  The request contains
+  - the `peer`, see [Get a CameraId](#get-a-cameraid)
+  - `resolution`, currently not supported
+  - optionally a `streamId`, see [Get a StreamId](#get-a-streamid).
+  - optionally a `playbackTime`, a datetime string in [ISO 8601][iso-8601] format.
+  - optionally a `skipGaps`, optional boolean. If `true`, gaps between video sequences are skipped during playback; otherwise, no frames are streamed for the duration of the gap.
+  - optionally a `playbackSpeed`, optional number. Sets the speed at which the video is played back.  The default is 1.0, and any value > 0 and ≤ 32 is valid.
+  - optionally `iceServers` see [STUN and TURN server addresses](#stun-and-turn-server-addresses).
+3. The reponse will contain
+  - the `session`, the newly created `sessionId`
+  - optionally `iceServers` see [STUN and TURN server addresses](#stun-and-turn-server-addresses)
+4. After the response the server will send an `invite` request to the client.
+  The request contains:
+  - `session`, the current `sessionId`
+  - `offer`, the `offerSDP` which is used to update the `RTCPeerConnection` object `pc`.
+5. An `answerSDP` is created based on `pc`, and is sent as a response through the WebSocket.
+
+
+### How to calculate time for current frame
+
+1. In `commonSetup()` in `main.js`,
    - `frameStartTime` is set to either `Date.now` or the requested playback time. `frameStartTime` will be considered the start of streaming.
    - A callback function is registered for the `<video>` player. The function will be called next time a frame has been received.
    - The WebRTC session is initiated.
@@ -210,7 +249,7 @@ Playback is controlled by including an optional `PlaybackTimeNode` object when i
    To get `frameDate` (the date and time for the current frame), the `rtpTimestamp` value is added to `frameStartTime`.
 3. The function is registered again to be called next time a frame has been received.
 
-To register the callback function, the sample uses `requestVideoFrameCallback()` (currently a W3C Draft Community Group Report) for most browsers, and `requestAnimationFrame()` for FireFox:
+To register the callback function, the sample uses `requestVideoFrameCallback()` (currently a W3C Draft Community Group Report) for most browsers, and `requestAnimationFrame()` for FireFox:<!-- requestVideoFrameCallback supported in Firefox since version 132, see https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement/requestVideoFrameCallback -->
 
 - The `requestVideoFrameCallback()` method registers a callback to run when a new video frame has been received. See [HTMLVideoElement.requestVideoFrameCallback()][video-rvfc].
 - The `requestAnimationFrame()` method tells the browser to perform an animation and requests that the browser call a specified function to update an animation before the next repaint. See [Window: requestAnimationFrame() method][mdn-raf].
@@ -234,29 +273,15 @@ The sample supports specifying one of each in the user interface. More than one 
 
 The values passed on from the user interface are used in:
 
-- `start()` method in `main.js` where an `RTCPeerConnection` instance is created. This makes sure that the client uses the STUN and/or TURN servers passed on from the user interface when generating local ICE candidates.
+#### REST
+- `start()` method in `rest.js` where an `RTCPeerConnection` instance is created. This makes sure that the client uses the STUN and/or TURN servers passed on from the user interface when generating local ICE candidates.
 
-- `initiateWebRTCSession()` method in `main.js` where `body.iceServers` is populated. This sends the configuration to the API Gateway and makes sure that the API Gateway uses the STUN and/or TURN server defined in the user interface.
+- `initiateWebRTCSession()` method in `rest.js` where `body.iceServers` is populated. This sends the configuration to the API Gateway and makes sure that the API Gateway uses the STUN and/or TURN server defined in the user interface.
 
-No default STUN or TURN server URLs are configured API Gateway-side. To do so, the URLs for STUN and TURN servers can be defined in `appsettings.production.json`:
-
-```json
-{
-  "WebRTC": {
-    "iceServers": [ 
-      { "url": "stun:mystun.zyx:3478"}, 
-      { "url": "turn:myturn.zyx:5349"} 
-    ] 
-  }
-}
-```
+#### WebSocket
+- `connectToCamera()` method in `websocket.js` where `params.iceServers` is populated. This send the configuration to the API Gateway and makes sure the API Gateway uses the STUN and/or TURN server defined in the user interface.
 
 While it is no longer necessary to send the configuration to the API Gateway during signaling (in `body.iceServers` in `initiateWebRTCSession()` method), setting `body.iceServers` when creating a `RTCPeerConnection` instance is still required.
-
-> **TURN servers that require username and credential**  
-> `appsettings.production.json` cannot be used for a TURN server that require username and credential.
-
-For more information about STUN and TURN, see [WebRTC API STUN][mdn-webrtc-stun] and [WebRTC API TURN][mdn-webrtc-turn].
 
 ### Trickle ICE
 
@@ -267,6 +292,27 @@ To support getting candidates from the server at any time during the connection,
 ### WebRTC features in browsers
 
 Each browser has different levels of support for WebRTC features. The sample makes use of the [Adapter.js library][webrtc-adapter] which allows for improved browser compatibility when using [WebRTC API][mdn-webrtc-api].
+
+## PTZ commands
+
+XProtect supports sending PTZ commands through a WebRTC data channel. The sample creates the data channel in the following line of code:
+
+```javascript
+dataChannel = peerConnection.createDataChannel("commands", { protocol: "videoos-commands" });
+```
+
+Later on, when a PTZ arrow in the sample user interface is selected, a PTZ command is sent by the following function:
+
+```javascript
+async function command(command) {
+    var ptzCommand = { 
+        ApiVersion : "1.0",
+        type: "request",
+        method: "ptzMove",
+        params: { direction: command }
+    };
+    dataChannel.send(JSON.stringify(ptzCommand));
+```
 
 ## Limitations and workarounds
 
@@ -303,8 +349,8 @@ In Chromium-based browsers, mDNS support can be disabled by opening `chrome://fl
 - Browser Developer tools Console shows CORS errors:
 
   ```txt
-  Access to fetch at 'http://test-01/api/IDP/connect/token' from origin 'http://localhost' has been blocked by CORS policy: . . .
-  Access to fetch at 'http://test-01/api/REST/v1/WebRTC/Session' from origin 'http://localhost' has been blocked by CORS policy: . . .
+  Access to fetch at 'http://test-01/API/IDP/connect/token' from origin 'http://localhost' has been blocked by CORS policy: . . .
+  Access to fetch at 'http://test-01/API/rest/v1/WebRTC/Session' from origin 'http://localhost' has been blocked by CORS policy: . . .
   ```
 
 #### Cause
@@ -325,25 +371,33 @@ Open your browser Developer tools and select the Network tab. If it is not an CO
 
 #### Cause
 
-CORS error can occur if using Firefox and self-signed certificates.
+Your servers are using self-signed certificates and you are using a version of Firefox before version 120. Firefox before version 120 did not use the operating system's certificate store and won't know about the root certificate you have added to trust the self-signed certificates. Under some circumstances, this might result in CORS errors.
 
 #### Remedy
 
-Firefox does not use the Windows Certificate Store, so importing the certificate into Trusted Root Certification Authorities will not work in Firefox.
-Add the API Gateway server to the certificate administration -> servers in Firefox under security. If your IDP server is hosted at another url, make sure to add this as well.
-See following examples:
+The easiest work-around is to add the API Gateway and IDP server addresses to the list of sites that Firefox accepts even though their certificates can't be verified.
 
-API Gateway url: myurl.domain/api
+1. In the Firefox application menu, select **Settings**.
+2. Find the **Privacy & Security** | **Security** | **Certificates** section.
+3. Select **View Certificates...**.
+4. In the **Certificates Manager** dialog, select the **Servers** tab.
+5. Select **Add Exception...**
+6. In the **Add Security Exception** dialog, add the server URL and select **Get Certificate**.
+7. If the untrusted certificate can be retrieved, you can now select **Confirm Security Exception** to allow this certificate.
 
-IDP url: myurl.domain/IDP
+For example:
 
-In this example myurl.domain needs to be added to the excemptions.
+- API Gateway: `https://host.domain/API`
+- IDP: `https://host.domain/IDP`
 
-API Gateway url: myurl.domain/api
+In this example, add `https://host.domain`.
 
-IDP url: mysecondurl.domain/IDP
+If your IDP server is hosted at another URL, make sure to add this as well:
 
-In this example both myurl.domain and mysecondurl.domain need to be added to the excemptions.
+- API Gateway: `host1.domain/API`
+- IDP: `host2.domain/IDP`
+
+In this example both `host1.domain/API` and `host2.domain/IDP` need to be added to the exceptions.
 
 ### No connection through a symmetric NAT firewall
 
@@ -417,6 +471,7 @@ Use a playback time closer than 24 days to the start of recorded video.
 
 - The signaling required to set up a WebRTC connection with an XProtect VMS
 - Using an OAuth2 bearer token to authenticate WebRTC signaling and media streaming
+- Sending PTZ commands through WebRTC datachannel
 
 ## Using
 
@@ -433,8 +488,6 @@ Use a playback time closer than 24 days to the start of recorded video.
 [ietf-trickle-ice]: https://datatracker.ietf.org/doc/html/draft-ietf-mmusic-trickle-ice
 [mdn-webrtc-api]: https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/
 [mdn-webrtc-sign]: https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling
-[mdn-webrtc-stun]: https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Protocols#stun
-[mdn-webrtc-turn]: https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Protocols#turn
 [mdn-webrtc-rtcpeer]: https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection
 [mdn-cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [mdn-raf]: https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame

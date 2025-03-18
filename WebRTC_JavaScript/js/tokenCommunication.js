@@ -1,7 +1,10 @@
-//Security token have an expiry time, this function updates the token
+
+let refreshTokenString = null;
+
+//Security token have an expiry time, this function updates the token using the refresh token from the login response
 async function refreshToken() {
 
-    var refreshedToken = await getToken();
+    var refreshedToken = await getRefreshedToken();
     if (token != null && token != refreshedToken) {
         token = refreshedToken;
     }
@@ -33,6 +36,39 @@ async function refreshToken() {
     });
 }
 
+async function getRefreshedToken() {
+    token = null;
+    clearAnyRefreshTimers();
+
+    var idpUrl = apiGatewayUrl + "/IDP/connect/token";
+
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("grant_type", "refresh_token");
+    urlencoded.append("refresh_token", refreshTokenString);
+    urlencoded.append("client_id", "VmsClient");
+
+    await fetch(idpUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: urlencoded,
+    }).then(async function (response) {
+        await checkResponseFromIdp(response);
+        const json = await response.json();
+        token = json["access_token"];
+        refreshTokenString = json["refresh_token"];
+
+        setupRefreshTokenTimer(json["expires_in"]);
+    }).catch(function (error) {
+        var msg = "Failed to retrieve refreshed token - " + error;
+        console.log(msg);
+        log(msg);
+    });
+
+    return token;
+}
+
 async function getToken() {
     token = null;
     clearAnyRefreshTimers();
@@ -45,7 +81,7 @@ async function getToken() {
     urlencoded.append("grant_type", "password");
     urlencoded.append("username", username);
     urlencoded.append("password", password);
-    urlencoded.append("client_id", "GrantValidatorClient");
+    urlencoded.append("client_id", "VmsClient");
 
     await fetch(idpUrl, {
         method: 'POST',
@@ -57,6 +93,7 @@ async function getToken() {
         await checkResponseFromIdp(response);
         const json = await response.json();
         token = json["access_token"];
+        refreshTokenString = json["refresh_token"];
 
         setupRefreshTokenTimer(json["expires_in"]);
     }).catch(function (error) {
