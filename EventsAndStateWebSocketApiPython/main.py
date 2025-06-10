@@ -53,7 +53,7 @@ async def main(gateway_uri, access_token, mode):
 
             receive_events_task = None
 
-            async with connect(connection_uri, extra_headers={"Authorization": f"Bearer {access_token}"}) as web_socket:
+            async with connect(connection_uri, additional_headers={"Authorization": f"Bearer {access_token}"}) as web_socket:
 
 
                 # Start or resume session

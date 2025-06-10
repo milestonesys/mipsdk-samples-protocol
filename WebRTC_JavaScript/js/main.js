@@ -1,7 +1,7 @@
 'use strict';
 
 let peerConnection, sessionId, dataChannel;
-let apiGatewayUrl, webRtcUrl, cameraId, streamId, token, playbackTime, skipGaps, speed, stunUrl, turnUrl, turnUserName, turnCredential;
+let apiGatewayUrl, webRtcUrl, deviceId, streamId, token, playbackTime, skipGaps, speed, stunUrl, turnUrl, turnUserName, turnCredential, includeAudio;
 let candidates = [];
 let iceServers = [];
 let refreshTimerId;
@@ -11,6 +11,9 @@ let isPlayback = false;
 let frameDate;
 let aux1, aux2, aux3, aux4 = false;
 let apiEndPoint;
+
+// The audio clock rate of PCMU is 8000 Hz. If another audio codec is used, this rate needs to be adjusted accordingly.
+let audioClockRate = 8000;
 
 
 async function login() {
@@ -28,13 +31,25 @@ async function login() {
 const onAnimationFrameReceived = () => {
     let receiver = peerConnection.getReceivers()[0];
     if (receiver) {
-        let synchronizationData = receiver.getSynchronizationSources()[0];
-        if (synchronizationData) {
-            frameDate = new Date(frameStartTime + synchronizationData.rtpTimestamp);
-            document.getElementById("frameTimeLabel").innerHTML = formatDate(frameDate);
+        let kind = receiver.track.kind;
+        if (kind == "audio")
+        {
+            let synchronizationData = receiver.getSynchronizationSources()[0];
+            if (synchronizationData) {
+                // Synchronization timestamp from the audio receiver contains the sample rate and not milliseconds; therefore, we have to convert the sample rate to milliseconds.
+                frameDate = new Date(frameStartTime + (synchronizationData.rtpTimestamp / (audioClockRate / 1000)));
+                document.getElementById("frameTimeLabel").innerHTML = formatDate(frameDate);
+            }
         }
+        if (kind == "video") {
+            let synchronizationData = receiver.getSynchronizationSources()[0];
+            if (synchronizationData) {
+                frameDate = new Date(frameStartTime + (synchronizationData.rtpTimestamp));
+                document.getElementById("frameTimeLabel").innerHTML = formatDate(frameDate);
+            }
+        }
+        
     }
-
     requestAnimationFrame(onAnimationFrameReceived);
 }
 
@@ -48,8 +63,9 @@ async function commonSetup() {
     if (apiGatewayUrl.slice(-1) == '/')
         apiGatewayUrl = apiGatewayUrl.slice(0, -1);
     webRtcUrl = apiGatewayUrl + apiEndPoint;
-    cameraId = document.getElementById("cameraId").value;
+    deviceId = document.getElementById("deviceId").value;
     streamId = document.getElementById("streamId").value;
+    includeAudio = document.getElementById("includeAudio").checked;
     playbackTime = document.getElementById("playbackTime").value;
     skipGaps = document.getElementById("skipGaps").checked;
     speed = document.getElementById("speed").value;
@@ -58,6 +74,9 @@ async function commonSetup() {
     turnUserName = document.getElementById("turnUserName").value;
     turnCredential = document.getElementById("turnCredential").value;
 
+    //Audio stream is disabled when playback speed is not 1.0(default value when not explicitly set)
+    includeAudio = includeAudio && (!speed || parseFloat(speed) === 1);
+		
     if (stunUrl) {
         iceServers.push({ urls: stunUrl });
     }
@@ -65,23 +84,16 @@ async function commonSetup() {
         iceServers.push({ urls: turnUrl, username: turnUserName, credential: turnCredential });
     }
     if (playbackTime) {
-        
         frameStartTime = Date.parse(playbackTime);
     }
 
     await login();
 
     peerConnection = new RTCPeerConnection({ iceServers: iceServers });
-
     peerConnection.ontrack = evt => document.querySelector('#videoCtl').srcObject = evt.streams[0];
-
     videoObject = document.querySelector('#videoCtl');
 
-    if (navigator.userAgent.search("Firefox")) {
-        requestAnimationFrame(onAnimationFrameReceived);
-    } else {
-        videoObject.requestVideoFrameCallback?.(onFrameReceived);
-    }
+    requestAnimationFrame(onAnimationFrameReceived);
 
     // Diagnostics
     peerConnection.onconnectionstatechange = () => {
@@ -193,4 +205,8 @@ async function aux(auxNumb) {
         }
     };
     dataChannel.send(JSON.stringify(auxCommand));
+}
+
+function clearDiagnosticsLog() {
+    document.getElementById('diagnostics').innerHTML = '';
 }
