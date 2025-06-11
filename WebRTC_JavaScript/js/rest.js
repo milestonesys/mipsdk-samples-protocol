@@ -1,7 +1,6 @@
 // Timeout in milliseconds for polling API Gateway
 const pollingTimeout = 20;
 let videoObject;
-let addServerCandidatesErrorCounter = 0;
 
 async function start() {
     apiEndPoint = "/REST/v1/WebRTC";
@@ -14,14 +13,9 @@ async function start() {
 
 async function initiateWebRTCSession() {
     try {
-        let body = { deviceId: deviceId, resolution: "notInUse" };
-
+        let body = { cameraId: cameraId, resolution: "notInUse" };
         if (streamId)
             body.streamId = streamId;
-
-        // includeAudio is optional parameter and if not set in the body, it will default to true
-        body.includeAudio = includeAudio;
-
         if (playbackTime && !reconnect || !frameDate) {
             let playbackTimeNode = { playbackTime: playbackTime };
             if (speed)
@@ -73,9 +67,7 @@ async function initiateWebRTCSession() {
                     dataChannel = peerConnection.createDataChannel("commands", { protocol: "videoos-commands" });
                     console.log(`Data channel opened with protocol ${dataChannel.protocol}`);
                 });
-
             // Add server ICE candidates
-            addServerCandidatesErrorCounter = 0;
             addServerIceCandidates();
 
             console.log('InitiateWebRTCSession end');
@@ -144,19 +136,13 @@ async function addServerIceCandidates() {
                 }
             }
 
-            //success, reset error counter
-            addServerCandidatesErrorCounter = 0;
-
         }).catch(function (error) {
             let msg = "Failed to retrieve ICE candidate from server - " + error;
             console.log(msg);
             log(msg);
-            addServerCandidatesErrorCounter++;
         });
 
-        if(addServerCandidatesErrorCounter < 3) {
-            setTimeout(addServerIceCandidates, pollingTimeout);
-        }
+        setTimeout(addServerIceCandidates, pollingTimeout);
     }
 }
 

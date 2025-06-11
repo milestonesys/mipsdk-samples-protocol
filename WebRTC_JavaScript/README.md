@@ -22,18 +22,16 @@ For more information, see <a href="https://doc.developer.milestonesys.com/html/i
 
 - For RESTful:
   - XProtect 2023 R1 or later (stream, playback and TURN server configuration requires 2023 R3).
-- For WebSocket:
+- For WebSocket
   - XProtect 2025 R1 or later.
-- For audio support:
-  - XProtect 2025 R2 or later.
 - Camera with H.264 protocol.
 - An XProtect basic user, created locally, with access to the camera.
 - Chrome, Edge, Firefox, or Safari web browser.
-- CORS configuration if the sample webpage isn't served from the same origin host URL as the API Gateway, see [API Gateway CORS settings][cors].
+- CORS configuration if the sample webpage is not served from the same origin host URL as the API Gateway, see [API Gateway CORS settings][cors].
 - If both browser and the API Gateway are on a local private network:
   - Both on same local network segment and API Gateway supports mDNS,  
     see [WebRTC connection on a local network uses mDNS][locm], or
-  - Routers on local network doesn't block `X-Forwarded-For` or `Remote_Addr` headers,  
+  - Routers on local network does not block `X-Forwarded-For` or `Remote_Addr` headers,  
     see [WebRTC connections across routers in a local network][loch], or
   - mDNS disabled in the browser,  
     see [Disable browser mDNS support][disa].
@@ -64,19 +62,13 @@ These configuration files are relevant for the sample:
 - `appsettings.production.json`: Overrides the configuration settings in `appsettings.json`.
 - `appsettings.json`: Reverse proxy (routing), CORS, WebRTC, log levels, etc.
 
-### Editing configuration files
+> Do not edit `appsettings.json` manually. This file is created by the product installer and maintained by the **Server Configurator**.
+
+If needed, create `appsettings.production.json` and add configuration overrides to this file. This file will not be removed or changed by product updates.
 
 > Use a validating editor to edit configuration files. Most popular code editors support JSON and XML syntax validation, either by default or through extensions.
 
 Syntax errors in the API Gateway configurations files result in `502 Bad Gateway` or `503 Service Unavailable` server errors and will show up in the Windows Application event log and the IIS request log.
-
-### appsettings.json and appsettings.Production.json
-
-> Don't edit `appsettings.json` manually. This file is created by the product installer and maintained by the **Server Configurator**.
-
-If you need to override a configuration setting in `appsettings.json`, create `appsettings.Production.json` and add configuration overrides here. `appsettings.Production.json` won't be removed or changed by product updates.
-
-In `appsettings.Production.json`, include only the properties that you need to override.
 
 ### API Gateway CORS settings
 
@@ -114,20 +106,18 @@ For more information about CORS, please refer to [Cross-Origin Resource Sharing 
 1. Open `index.html` in a browser
 2. Enter the URL of the API Gateway.  
    Usually, the API Gateway is installed on the same host as the management server, that is, the API Gateway will be something like `https://managementServer.example.com/api`.
-3. Enter the **DeviceId**. Supported device types are camera with H.264 support or a microphone.  
-   See [Get a DeviceId](#get-a-deviceid).
-4. Optionally, enter a **StreamId**. See [Get a StreamId](#get-a-streamid).
-5. Optionally, deselect **Include Audio**. See [Audio stream](#audio-stream).
-6. Optionally, enter an ISO 8601-formatted datetime string in **Playback Time** to request video playback instead of live video.
-7. Optionally, select **Skip Gaps** to skip gaps between video sequences in video playback.
-8. Optionally, enter a number in **Playback Speed**. The default is 1.0, and any value > 0 and ≤ 32 is valid.
-9. Enter **Username** and **Password** of a basic user with access to the camera.
-10. Optionally, enter a STUN server address, for example `stun:stun1.l.google.com:19302`.
-11. Optionally, enter a TURN server address, username, and credential (password).
-12. Select signaling protocol. Default selection is REST, See [Signaling protocols](#signaling-protocols).
-13. Select **Start** to establish the connection.
+3. Enter the **CameraId** of a camera that supports H.264.  
+   See [Get the CameraId](#get-a-cameraid).
+4. Optionally, enter a **StreamId**. See [Get a StreamId](#get-a-streamid).  
+5. Optionally, enter an ISO 8601-formatted datetime string in **Playback Time** to request video playback instead of live video.
+6. Optionally, select **Skip Gaps** to skip gaps between video sequences in video playback.
+7. Optionally, enter a number in **Playback Speed**. The default is 1.0, and any value > 0 and ≤ 32 is valid.
+8. Enter **Username** and **Password** of a basic user with access to the camera.
+9. Optionally, enter a STUN server address, for example `stun:stun1.l.google.com:19302`.
+10. Optionally, enter a TURN server address, username, and credential (password).
+11. Select **Start** to establish the connection.
 
-### Get a DeviceId
+### Get a CameraId
 
 You can use the Management Client to get a `CameraId`:
 
@@ -136,14 +126,6 @@ You can use the Management Client to get a `CameraId`:
 3. Select the **Info** tab in the **Properties** pane.
 4. Ctrl+Click the video image in the **Preview** pane.  
    The camera ID will be displayed at the bottom of the **Properties** pane.
-
-You can use the Management Client to get a `MicrophoneId`:
-
-1. In the **Site Navigation** pane, select **Servers** and then select the recording server.
-2. Select a microphone.
-3. Select the **Info** tab in the **Properties** pane.
-4. Ctrl+Click the video image in the **Preview** pane.  
-   The microphone ID will be displayed at the bottom of the **Properties** pane.
 
 ### Get a StreamId
 
@@ -162,25 +144,6 @@ You can use the Management Client to get a `StreamId`:
 7. A small XML document describing available streams will open in your default XML application.
 8. Use the value of a `<referenceid>` element of an H.264 as `StreamId`.
 
-### Audio stream
-
-The sample supports including audio in the WebRTC stream. It's configurable using `Include Audio`. It's an optional parameter. If not set, it defaults to true.
-
-If **DeviceId** is camera ID, and `Include Audio` is true, the audio stream from a related microphone will be included in the WebRTC session. If you don't want to include audio from the related microphone, you must set `Include Audio` to false.
-
-If **DeviceId** is microphone ID, `Include Audio` must be true; otherwise the WebRTC session will fail to initiate.
-
-> **_NOTE:_** For playback, the audio stream in the sample is only available when playback speed is 1.0.
-
-### Signaling protocols
-
-The following WebRTC signaling protocols are supported:
-
-- REST
-- WebSockets
-
-RESTful signaling might be a bit slower as the client will have to poll for ICE Candidates from the API Gateway. WebSockets may have disadvantages in some network environments. In most WebRTC implementations, WebSockets is preferred.
-
 ## Description
 
 Following is the description of the two different ways of setup of the WebRTC connection.
@@ -196,10 +159,9 @@ Please look at the `rest.js` code while reading the following steps:
 
 1. In `initiateWebRTCSession()`, the session is initiated by a POST request to `API/REST/v1/WebRTC/Session`.  
    The request body contains
-   - the `deviceId`, see [Get a DeviceId](#get-a-deviceid)
+   - the `cameraId`, see [Get a CameraId](#get-a-cameraid)
    - `resolution`, currently not supported
    - optionally a `streamId`, see [Get a StreamId](#get-a-streamid),
-   - optionally an `includeAudio`,
    - optionally a `PlaybackTimeNode`, see [Playback of recorded video](#playback-of-recorded-video),
    - `iceServers` see [STUN and TURN server addresses](#stun-and-turn-server-addresses),
 2. The response contains the newly created `sessionId` and the `offerSDP` which is used to update the `RTCPeerConnection` object `pc`.
@@ -259,23 +221,23 @@ Please look at `websocket.js` code while reading the following:
 
 1. In the `startWebSocket()`, a new websocket is opened and a `register` request is sent to the API Gateway.
 2. Once the server responds the callback will send a `connect` request.
-   The request contains
-   - the `peer`, see [Get a DeviceId](#get-a-deviceid)
-   - `resolution`, currently not supported
-   - optionally a `streamId`, see [Get a StreamId](#get-a-streamid).
-   - optionally an `includeAudio`,
-   - optionally a `playbackTime`, a datetime string in [ISO 8601][iso-8601] format.
-   - optionally a `skipGaps`, optional boolean. If `true`, gaps between video sequences are skipped during playback; otherwise, no frames are streamed for the duration of the gap.
-   - optionally a `playbackSpeed`, optional number. Sets the speed at which the video is played back.  The default is 1.0, and any value > 0 and ≤ 32 is valid.
-   - optionally `iceServers` see [STUN and TURN server addresses](#stun-and-turn-server-addresses).
-3. The response will contain
-   - the `session`, the newly created `sessionId`
-   - optionally `iceServers` see [STUN and TURN server addresses](#stun-and-turn-server-addresses)
+  The request contains
+  - the `peer`, see [Get a CameraId](#get-a-cameraid)
+  - `resolution`, currently not supported
+  - optionally a `streamId`, see [Get a StreamId](#get-a-streamid).
+  - optionally a `playbackTime`, a datetime string in [ISO 8601][iso-8601] format.
+  - optionally a `skipGaps`, optional boolean. If `true`, gaps between video sequences are skipped during playback; otherwise, no frames are streamed for the duration of the gap.
+  - optionally a `playbackSpeed`, optional number. Sets the speed at which the video is played back.  The default is 1.0, and any value > 0 and ≤ 32 is valid.
+  - optionally `iceServers` see [STUN and TURN server addresses](#stun-and-turn-server-addresses).
+3. The reponse will contain
+  - the `session`, the newly created `sessionId`
+  - optionally `iceServers` see [STUN and TURN server addresses](#stun-and-turn-server-addresses)
 4. After the response the server will send an `invite` request to the client.
   The request contains:
-   - `session`, the current `sessionId`
-   - `offer`, the `offerSDP` which is used to update the `RTCPeerConnection` object `pc`.
+  - `session`, the current `sessionId`
+  - `offer`, the `offerSDP` which is used to update the `RTCPeerConnection` object `pc`.
 5. An `answerSDP` is created based on `pc`, and is sent as a response through the WebSocket.
+
 
 ### How to calculate time for current frame
 
@@ -294,7 +256,7 @@ To register the callback function, the sample uses `requestVideoFrameCallback()`
 
 When there are gaps between video sequences:
 
-- If `skipGaps` wasn't enabled, no frames are streamed during gaps between video sequences.
+- If `skipGaps` was not enabled, no frames are streamed during gaps between video sequences.
 - If `skipGaps` was enabled, frames from the next video sequence get streamed immediately as if no gap had occurred.
 
 In any case, the `rtpTimestamp` for the next video sequence jumps as if frames had been streamed during the gap.
@@ -312,15 +274,14 @@ The sample supports specifying one of each in the user interface. More than one 
 The values passed on from the user interface are used in:
 
 #### REST
-
 - `start()` method in `rest.js` where an `RTCPeerConnection` instance is created. This makes sure that the client uses the STUN and/or TURN servers passed on from the user interface when generating local ICE candidates.
+
 - `initiateWebRTCSession()` method in `rest.js` where `body.iceServers` is populated. This sends the configuration to the API Gateway and makes sure that the API Gateway uses the STUN and/or TURN server defined in the user interface.
 
 #### WebSocket
-
 - `connectToCamera()` method in `websocket.js` where `params.iceServers` is populated. This send the configuration to the API Gateway and makes sure the API Gateway uses the STUN and/or TURN server defined in the user interface.
 
-While it's no longer necessary to send the configuration to the API Gateway during signaling (in `body.iceServers` in `initiateWebRTCSession()` method), setting `body.iceServers` when creating a `RTCPeerConnection` instance is still required.
+While it is no longer necessary to send the configuration to the API Gateway during signaling (in `body.iceServers` in `initiateWebRTCSession()` method), setting `body.iceServers` when creating a `RTCPeerConnection` instance is still required.
 
 ### Trickle ICE
 
@@ -345,7 +306,7 @@ Later on, when a PTZ arrow in the sample user interface is selected, a PTZ comma
 ```javascript
 async function command(command) {
     var ptzCommand = { 
-        jsonrpc : "2.0",
+        ApiVersion : "1.0",
         type: "request",
         method: "ptzMove",
         params: { direction: command }
@@ -402,7 +363,7 @@ Enable CORS support as described in [API Gateway CORS settings][cors].
 
 #### Cause
 
-Errors are sometimes presented in the browser as CORS errors without being actual CORS issues. If you see a CORS error message in the browser, it could be related to configuration issues in the IIS.
+Errors are sometime presented in the browser as CORS error without being actual CORS issues. If you see a CORS error message in the browser, it could be related to configuration issues in the IIS.
 
 #### Remedy
 
@@ -506,21 +467,6 @@ The requested playback time is more than 24 days before the start of the recorde
 
 Use a playback time closer than 24 days to the start of recorded video.
 
-### Connection is closed right after it is established
-
-#### Symptoms
-
-- ICE connection state changes to 'connected' but connection goes directly to state 'failed'
-![Diagnostics log](DiagnosticsLog_ConnectionError.png)
-
-#### Cause
-
-Running WebRTC through Chrome (or other WebKit-based browsers) with a version of XProtect older than 2024 R1 will result in the symptom described above. A security update was released for WebKit browsers that requires an improved security connection. As a result, these browsers will fail any WebRTC connection to XProtect versions earlier than 2024 R1 or 2023 R3 with the applied security patch.
-
-#### Remedy
-
-Upgrade to XProtect 2024 R1 or if running 2023 R3, apply hotfix. Read [Milestone KB Article](https://supportcommunity.milestonesys.com/s/article/WebRTC-fails-in-Chrome-v-124-troubleshooting-hotfix?language=en_US) for more information.
-
 ## The sample demonstrates
 
 - The signaling required to set up a WebRTC connection with an XProtect VMS
@@ -530,7 +476,7 @@ Upgrade to XProtect 2024 R1 or if running 2023 R3, apply hotfix. Read [Milestone
 ## Using
 
 - A simple WebRTC client based on [RTCPeerConnection][mdn-webrtc-rtcpeer]
-- A RESTful API for WebRTC signaling with an XProtect API Gateway
+- A RESTfull API for WebRTC signaling with an XProtect API Gateway
 
 [disa]: #disable-browser-mdns-support
 [conf]: #configuration-files

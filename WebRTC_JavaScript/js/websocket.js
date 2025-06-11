@@ -26,11 +26,11 @@ async function registerClient() {
     socket.send(JSON.stringify(createJson("register", {authorization: token}, registerId)));
 }
 
-async function connectToDevice() {
+async function connectToCamera() {
     connectId = 2;
     var params = {
         authorization: token,
-        peer: deviceId
+        peer: cameraId
     };
     if(streamId !== "") {
         params.streamID = streamId;
@@ -46,16 +46,13 @@ async function connectToDevice() {
     if(iceServers.length > 0) {
         params.iceServers = iceServers;
     }
-
-    // includeAudio is optional parameter and if not set, it will default to true
-    params.includeAudio = includeAudio;
     
     socket.send(JSON.stringify(createJson("connect", params, connectId)));
 }
 
 async function answerSDP(sdp, id) {
     var answer = {
-        jsonrpc: "2.0",
+        ApiVersion: "1.0",
         result: {
             answer: JSON.stringify(sdp)
         },
@@ -66,7 +63,7 @@ async function answerSDP(sdp, id) {
 
 function createJson(methodName, data, id) {
     var json = {
-        jsonrpc: "2.0",
+        ApiVersion: "1.0",
         method: methodName,
         params: data
     }
@@ -79,7 +76,7 @@ function createJson(methodName, data, id) {
 function readMessage(data) {
     if(data.hasOwnProperty("id")) {
         if(data.id == registerId) {
-            connectToDevice();
+            connectToCamera();
         }
         else if(data.id == connectId) {
             sessionId = data.result.session;
