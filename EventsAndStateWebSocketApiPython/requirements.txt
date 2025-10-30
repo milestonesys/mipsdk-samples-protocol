@@ -3,4 +3,4 @@ keyboard
 requests
 requests-ntlm
 urllib3
-websockets
+websockets>=15.0.1

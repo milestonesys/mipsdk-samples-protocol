@@ -1,5 +1,6 @@
 let socket;
 let registerId, connectId, inviteId = -1;
+let receivedIceCandidates = [];
 
 async function startWebsocket() {
     apiEndPoint = "/ws/webrtc/v1";
@@ -7,11 +8,17 @@ async function startWebsocket() {
 
     peerConnection.onicecandidate = evt => evt.candidate && trickle(evt.candidate);
 
+    peerConnection.onicegatheringstatechange = () => {
+        if (peerConnection.iceGatheringState == "gathering") {
+            addReceivedIceCandidates();
+        }
+    };
+
     await openWebsocket();
 }
 
 async function openWebsocket() {
-    socket = new WebSocket(webRtcUrl);
+    socket = new WebSocket(webRtcUrl, "webrtc.onvif.org");
     socket.addEventListener("open", (event) => {
         registerClient();
     });
@@ -57,7 +64,7 @@ async function answerSDP(sdp, id) {
     var answer = {
         jsonrpc: "2.0",
         result: {
-            answer: JSON.stringify(sdp)
+            answer: sdp
         },
         id: id
     };
@@ -81,18 +88,22 @@ function readMessage(data) {
         if(data.id == registerId) {
             connectToDevice();
         }
-        else if(data.id == connectId) {
-            sessionId = data.result.session;
+        else if (data.id == connectId) {
+            //all parameters in the response is optional. If needed, we can do logic here, which uses some specific implementation. But for generic implementation, no parameters from connect should be used.            
         }
         else {
-            if(data.params.session == sessionId) {
-                var offer = JSON.parse(data.params.offer);
+            if (data.method == "invite") {
+                sessionId = data.params.session;
+                var offer = {
+                    "type": "offer",
+                    "sdp": data.params.offer
+                };
                 peerConnection.setRemoteDescription(offer);
 
                 peerConnection.createAnswer()
                     .then((answer) => peerConnection.setLocalDescription(answer))
                     .then(() => console.log("local sdp:\n" + peerConnection.localDescription.sdp))
-                    .then(() => answerSDP(peerConnection.localDescription, data.id))
+                    .then(() => answerSDP(peerConnection.localDescription.sdp, data.id))
                     .then(() => {
                         dataChannel = peerConnection.createDataChannel("commands", { protocol: "videoos-commands" });
                         console.log(`Data channel opened with protocol ${dataChannel.protocol}`);
@@ -101,12 +112,25 @@ function readMessage(data) {
         }
     }
     else {
-        if(data.method === "trickle") {
-            peerConnection.addIceCandidate(data.params.candidate);
+        if (data.method === "trickle") {
+            if (peerConnection.iceGatheringState == "gathering") {
+                peerConnection.addIceCandidate(data.params.candidate);
+            } else {
+                receivedIceCandidates.push(data.params.candidate);
+            }
         }
         else {
             log(`Server error: ${data.params.message}`)
         }
+    }
+}
+
+function addReceivedIceCandidates() {
+    if (receivedIceCandidates.length > 0) {
+        receivedIceCandidates.forEach(candidate => {
+            peerConnection.addIceCandidate(candidate);
+        });
+        receivedIceCandidates = [];
     }
 }
 
@@ -130,7 +154,7 @@ async function tryReConnect(counter) {
 async function trickle(candidate) {
     var obj = {
         session: sessionId,
-        candidate: JSON.stringify(candidate)
+        candidate: candidate
     }
     socket.send(JSON.stringify(createJson("trickle", obj)));
 }
