@@ -67,7 +67,6 @@ input[type="email"] {
 .login {
     display: flex;
     flex-direction: column;
-    display-direction: row;
     gap: 10px;
 }
 
@@ -117,7 +116,7 @@ body, html {
 #events {
     width: 650px;
     height: 200px; 
-    font-family: 'Consolas';
+    font-family: 'Consolas',monospace;
 }
 #connectionHeading {
     /* Set a specific height for the h3 element */

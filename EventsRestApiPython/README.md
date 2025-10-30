@@ -22,16 +22,16 @@ The sample logs into the server, retrieves any existing user-defined event, trig
 - The API Gateway installed on the same host as the management server.
 - A user with the Administrators role.
 - An existing user defined event with event type retention policy greater than 0 days.
-- Python version 3.7 or newer.
+- Python version 3.10 or newer.
 - The Python packages 'requests' and 'requests-ntlm'. To install the package:
   - In a command prompt, enter `pip install <package-name>`.
   - In Visual Studio Solution Explorer, select a Python environment under Python Environments, then from the context menu select Manage Python Packages and search for *\<package-name>*.
 
 The sample is verified with the following versions of Python packages:
 
-- requests: 2.26.0
-- requests-ntlm: 1.2.0
-- urllib3: 1.26.16
+- requests: 2.32.5
+- requests-ntlm: 1.3.0
+- urllib3: 2.5.0
 
 Using different package versions might result in unexpected errors when running the sample.
 

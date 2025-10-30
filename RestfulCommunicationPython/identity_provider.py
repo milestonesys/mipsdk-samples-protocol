@@ -41,6 +41,7 @@ def get_token_basic(
     url = f"{serverUrl}/API/IDP/connect/token"
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     payload = f"grant_type=password&username={username}&password={password}&client_id=GrantValidatorClient"
+    # note: verify=False should only be set in test environments, in production environments SSL certificates should always be verified.
     return session.request("POST", url, headers=headers, data=payload, verify=False)
 
 
@@ -51,6 +52,7 @@ def get_token_windows(
     url = f"{serverUrl}/IDP/connect/token"
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     payload = f"grant_type=windows_credentials&client_id=GrantValidatorClient"
+    # note: verify=False should only be set in test environments, in production environments SSL certificates should always be verified.
     return session.request(
         "POST",
         url,
